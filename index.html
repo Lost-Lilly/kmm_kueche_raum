@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Interaktiver Raum</title>
+<title>kmm kueche</title>
 <style>
     html, body {
         margin: 0;
@@ -125,9 +125,71 @@
   transform: translateX(-50%) translateY(-4px);
 }
 
+ /* Link-Buttons (Modal 3) */
+    .link-button {
+        display:flex;
+        align-items:center;
+        gap:10px;
+        padding:10px 12px;
+        border-radius:8px;
+        border:1px solid #ddd;
+        background:#fff;
+        box-shadow:0 4px 10px rgba(0,0,0,0.04);
+        text-decoration:none;
+        color:inherit;
+        transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
+    }
+
+    /* Hover: leichte Anhebung + Hintergrundfarbe */
+    .link-button:hover {
+        transform: translateY(-4px);
+        background: linear-gradient(180deg, #ffffff, #fbfbfb);
+        box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+    }
+
+    /* Fokus: sichtbarer Fokusring (Barrierefreiheit) */
+    .link-button:focus {
+        outline: 3px solid rgba(63,132,255,0.25);
+        outline-offset: 3px;
+    }
+
+    /* Für Browser, die :focus-visible unterstützen - nur dann den Ring zeigen */
+    .link-button:focus:not(:focus-visible) {
+        outline: none;
+    }
+
+    /* Kleine Icon-Box in Buttons */
+    .link-button svg { flex: 0 0 36px; height:36px; width:36px; }
+
+
+  /* Audio-Button (Modal 4) */
+    .audio-button {
+        display:inline-flex;
+        align-items:center;
+        gap:10px;
+        padding:10px 14px;
+        border-radius:8px;
+        border:1px solid #2b7cff;
+        background:#2b7cff;
+        color:white;
+        cursor:pointer;
+        font-weight:600;
+        box-shadow: 0 6px 18px rgba(43,124,255,0.12);
+        transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
+    }
+    .audio-button:hover { transform: translateY(-3px); background:#1f63d6; box-shadow: 0 10px 24px rgba(31,99,214,0.14); }
+    .audio-button:focus { outline: 3px solid rgba(43,124,255,0.25); outline-offset: 3px; }
+    .audio-button:active { transform: translateY(0); }
+
     @media (max-width:480px){
         #control-panel { right:6px; left:6px; }
+        .link-button { padding:10px; }
     }
+
+    /* Kleine Formatierung für Interview */
+    .interview p { margin:6px 0; }
+    .interview .speaker { font-weight:700; }
+    .konjunktiv { margin-top:12px; background:#fafafa; padding:10px; border-radius:6px; border:1px solid #eee; }
 </style>
 </head>
 <body>
@@ -249,7 +311,6 @@
 </div>
 </div>
 </div>
-
 <!-- Hotspot 3 (Teller) -->
 <img
     id="hotspot3"
@@ -264,25 +325,73 @@
 <div class="modal">
 <button class="close-btn" onclick="closeModal('modal3')">Schließen</button>
 <h2>Grundlagen Gestaltung</h2>
+
 <p>Zum Gestalten von Grafiken, Flyern, Posts, Magazinen usw. kann man verschiedene Programme verwenden.</p>
 <p>Die Adobe Programme werden oft von Firmen verwendet, um den Einstieg zu erleichtern, gibt es mehrere Tutorialvideos von Kreativen auf YouTube.</p>
 
-<h3>Illustrator</h3>
-<p><a href="https://youtu.be/3NBKRywEbNs?si=tRVhnZkZDoQV_XGF" target="_blank">Tutorial ansehen</a></p>
+<!-- Adobe Links als Buttons mit Icons -->
+<div style="display:flex; flex-direction:column; gap:8px; margin-top:10px;">
+    <a class="link-button" href="https://youtu.be/3NBKRywEbNs?si=tRVhnZkZDoQV_XGF" target="_blank">
+        <svg width="36" height="36" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img">
+            <rect width="36" height="36" rx="6" fill="#ff9a00"></rect>
+            <text x="18" y="23" font-family="Arial" font-size="14" fill="#fff" font-weight="700" text-anchor="middle">Ai</text>
+        </svg>
+        <div>
+            <div style="font-weight:600;">Illustrator</div>
+            <div style="font-size:13px; color:#555;">Tutorial ansehen (YouTube)</div>
+        </div>
+    </a>
 
-<h3>InDesign</h3>
-<p><a href="https://youtu.be/wF_fu1wcT0Y?si=viaFIvuiWSaijC8Z" target="_blank">Tutorial ansehen</a></p>
+    <a class="link-button" href="https://youtu.be/wF_fu1wcT0Y?si=viaFIvuiWSaijC8Z" target="_blank">
+        <svg width="36" height="36" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img">
+            <rect width="36" height="36" rx="6" fill="#ff3366"></rect>
+            <text x="18" y="23" font-family="Arial" font-size="14" fill="#fff" font-weight="700" text-anchor="middle">Id</text>
+        </svg>
+        <div>
+            <div style="font-weight:600;">InDesign</div>
+            <div style="font-size:13px; color:#555;">Tutorial ansehen (YouTube)</div>
+        </div>
+    </a>
 
-<h3>Photoshop</h3>
-<p><a href="https://youtu.be/xTzvQkOll2U?si=orQbilAffnwwcCaR" target="_blank">Tutorial ansehen</a></p>
+    <a class="link-button" href="https://youtu.be/xTzvQkOll2U?si=orQbilAffnwwcCaR" target="_blank">
+        <svg width="36" height="36" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img">
+            <rect width="36" height="36" rx="6" fill="#31a8ff"></rect>
+            <text x="18" y="23" font-family="Arial" font-size="14" fill="#fff" font-weight="700" text-anchor="middle">Ps</text>
+        </svg>
+        <div>
+            <div style="font-weight:600;">Photoshop</div>
+            <div style="font-size:13px; color:#555;">Tutorial ansehen (YouTube)</div>
+        </div>
+    </a>
+</div>
 
-<p>Es gibt auch gute kostenfreie Alternativen zu den Programmen.</p>
+<p style="margin-top:12px;">Es gibt auch gute kostenfreie Alternativen zu den Programmen.</p>
 
-<h3>Canva</h3>
-<p><a href="https://www.canva.com/de_de/herunterladen/windows/" target="_blank">Zur Website</a></p>
+<!-- Kostenfreie Alternativen als Buttons -->
+<div style="display:flex; flex-direction:column; gap:8px; margin-top:8px;">
+    <a class="link-button" href="https://www.canva.com/de_de/herunterladen/windows/" target="_blank">
+        <svg width="36" height="36" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img">
+            <circle cx="18" cy="18" r="18" fill="#00c4a7"></circle>
+            <text x="18" y="23" font-family="Arial" font-size="14" fill="#fff" font-weight="700" text-anchor="middle">C</text>
+        </svg>
+        <div>
+            <div style="font-weight:600;">Canva</div>
+            <div style="font-size:13px; color:#555;">Zur Website</div>
+        </div>
+    </a>
 
-<h3>Affinity</h3>
-<p><a href="https://www.affinity.studio/de_de/download" target="_blank">Zur Website</a></p>
+    <a class="link-button" href="https://www.affinity.studio/de_de/download" target="_blank">
+        <svg width="36" height="36" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img">
+            <rect width="36" height="36" rx="6" fill="#7b61ff"></rect>
+            <text x="18" y="23" font-family="Arial" font-size="14" fill="#fff" font-weight="700" text-anchor="middle">A</text>
+        </svg>
+        <div>
+            <div style="font-weight:600;">Affinity</div>
+            <div style="font-size:13px; color:#555;">Zur Website</div>
+        </div>
+    </a>
+</div>
+
 </div>
 </div>
 
@@ -299,10 +408,49 @@
 <div class="modal-overlay" id="modal4">
     <div class="modal">
         <button class="close-btn" onclick="closeModal('modal4')">Schließen</button>
+
         <h2>Professionelles Deutsch</h2>
-        <p>Informationen zum Konjuktiv 2.</p>
+
+        <div class="interview" aria-label="Interview">
+            <p style="color: #555;font-size: 20px;">Interview</p>
+
+            <p><span class="speaker">Interviewer:</span> Warum haben Sie sich für das Studium Kommunikation und Medienmanagement entschieden?</p>
+            <p><span class="speaker">Studentin:</span> Ich habe mich schon immer für Medien, kreative Prozesse und strategische Kommunikation interessiert. Das Studium vereint all diese Bereiche perfekt.</p>
+
+            <p><span class="speaker">Interviewer:</span> Was gefällt Ihnen am meisten an Ihrem Studienalltag?</p>
+            <p><span class="speaker">Studentin:</span> Mir gefällt besonders die Kombination aus Praxisprojekten und theoretischen Grundlagen. Außerdem arbeite ich gerne im Team, was im Studium sehr häufig vorkommt.</p>
+
+            <p><span class="speaker">Interviewer:</span> Gibt es besondere Herausforderungen?</p>
+            <p><span class="speaker">Studentin:</span> Ja, vor allem das Zeitmanagement. Es gibt viele Projekte, Präsentationen und Gruppenarbeiten gleichzeitig. Man muss wirklich gut organisiert sein.</p>
+
+            <p><span class="speaker">Interviewer:</span> Welche beruflichen Ziele haben Sie nach dem Abschluss?</p>
+            <p><span class="speaker">Studentin:</span> Ich möchte gerne in eine Kommunikationsagentur gehen oder später im Bereich Social Media Management arbeiten. Kreativität und strategisches Denken zu verbinden, ist genau mein Ding.</p>
+        </div>
+
+        <div class="konjunktiv" aria-label="Konjunktiv II Text">
+            <p><strong>Text im Konjunktiv 2</strong></p>
+            <p>Die Studentin erzählte, sie habe sich für das Studium entschieden, weil sie sich schon immer für Medien, kreative Prozesse und strategische Kommunikation interessiert hätte. Das Studium vereine all diese Bereiche auf ideale Weise.</p>
+
+            <p>Sie meinte, am meisten würde ihr die Mischung aus Praxisprojekten und theoretischen Grundlagen gefallen. Besonders gerne würde sie im Team arbeiten, was im Studienalltag sehr häufig vorkäme.</p>
+
+            <p>Auf die Herausforderungen angesprochen, sagte sie, vor allem das Zeitmanagement wäre anspruchsvoll. Es gebe viele Projekte, Präsentationen und Gruppenarbeiten gleichzeitig, weshalb man sehr gut organisiert sein müsse.</p>
+
+            <p>Zu ihren Zukunftsplänen erklärte sie, sie würde nach dem Abschluss gerne in einer Kommunikationsagentur arbeiten oder später im Social Media Management tätig sein. Es mache ihr Freude, Kreativität mit strategischem Denken zu verbinden.</p>
+        </div>
+
+        <!-- Audio: Vorlesen lassen -->
+        <div style="margin-top:12px;">
+            <!-- Audiodatei: bitte in Medien/ ablegen oder Pfad anpassen -->
+            <audio id="modal4-audio" src="Medien/vorlesen_konjunktiv2.mp3" preload="none"></audio>
+
+            <button id="modal4-audio-btn" class="audio-button" aria-pressed="false" aria-label="Vorlesen lassen">
+                ▶ Vorlesen lassen
+            </button>
+        </div>
+
     </div>
 </div>
+
 
 <!-- Steuerungs-Panel: Größen anpassen
 <div id="control-panel">
@@ -355,6 +503,43 @@
     setupHotspot('hotspot2', 'modal2');
     setupHotspot('hotspot3', 'modal3');
     setupHotspot('hotspot4', 'modal4');
+
+        // Audio-Player für Modal 4
+    (function(){
+        const audio = document.getElementById('modal4-audio');
+        const btn = document.getElementById('modal4-audio-btn');
+
+        function updateAudioBtn(playing) {
+            if(!btn) return;
+            btn.setAttribute('aria-pressed', playing ? 'true' : 'false');
+            btn.textContent = playing ? '■ Stopp' : '▶ Vorlesen lassen';
+        }
+
+        // Expose to closeModal
+        window.updateAudioBtn = updateAudioBtn;
+
+        if(btn && audio) {
+            btn.addEventListener('click', function(){
+                if(audio.paused) {
+                    // start playing
+                    audio.play().then(() => {
+                        updateAudioBtn(true);
+                    }).catch(err => {
+                        console.warn('Audio konnte nicht abgespielt werden:', err);
+                    });
+                } else {
+                    audio.pause();
+                    audio.currentTime = 0;
+                    updateAudioBtn(false);
+                }
+            });
+
+            // Wenn Audio endet, Button zurücksetzen
+            audio.addEventListener('ended', function(){
+                updateAudioBtn(false);
+            });
+        }
+    })();
 
     // Größensteuerung: ändert die CSS width des Bildes
     function setSize(hotspotId, px) {
