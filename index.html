@@ -3,100 +3,133 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>kueche</title>
-    <style>
-        html, body {
-            margin: 0;
-            padding: 0;
-            overflow: hidden; /* kein Scrollen */
-            width: 100vw;
-            height: 100vh;
-        }
+<title>Interaktiver Raum</title>
+<style>
+    html, body {
+        margin: 0;
+        padding: 0;
+        overflow: hidden; /* kein Scrollen */
+        width: 100vw;
+        height: 100vh;
+    }
 
-        body {
-            background-image: url('Medien/Skizze_Raum.jpeg');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            position: relative; /* Referenz für absolute Hotspots */
-            font-family: Arial, sans-serif;
-        }
+    body {
+        background-image: url('Medien/Skizze_Raum.jpeg');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        position: relative; /* Referenz für absolute Hotspots */
+        font-family: Arial, sans-serif;
+    }
 
-        /* Hotspots: absolute Positionierung + zentriert an (left,top) */
-        .hotspot {
-            position: absolute;
-            cursor: pointer;
-            transition: transform 0.15s;
-            transform: translate(-50%, -50%); /* damit left/top die Mitte des Bildes definieren */
-            user-select: none;
-            -webkit-user-drag: none;
-        }
+    /* Hotspots: absolute Positionierung + zentriert an (left,top) */
+    .hotspot {
+        position: absolute;
+        cursor: pointer;
+        transition: transform 0.15s;
+        transform: translate(-50%, -50%); /* damit left/top die Mitte des Bildes definieren */
+        user-select: none;
+        -webkit-user-drag: none;
+    }
 
-        .hotspot:hover {
-            transform: translate(-50%, -50%) scale(1.05);
-        }
+    .hotspot:hover {
+        transform: translate(-50%, -50%) scale(1.05);
+    }
 
-        /* Modal */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            inset: 0; /* top:0;right:0;bottom:0;left:0 */
-            background: rgba(0,0,0,0.5);
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            z-index: 2000;
-        }
+    /* Modal */
+    .modal-overlay {
+        display: none;
+        position: fixed;
+        inset: 0; /* top:0;right:0;bottom:0;left:0 */
+        background: rgba(0,0,0,0.5);
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+        z-index: 2000;
+    }
 
-        .modal {
-            background: white;
-            padding: 18px;
-            border-radius: 10px;
-            max-width: 760px;
-            width: min(95%, 760px);
-            max-height: 85vh;
-            overflow: auto;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.3);
-        }
+    .modal {
+        background: white;
+        padding: 18px;
+        border-radius: 10px;
+        max-width: 760px;
+        width: min(95%, 760px);
+        max-height: 85vh;
+        overflow: auto;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+    }
 
-        .modal .close-btn {
-            float: right;
-            cursor: pointer;
-            background: #e23b3b;
-            color: white;
-            padding: 6px 10px;
-            border-radius: 6px;
-            border: none;
-        }
+    .modal .close-btn {
+        float: right;
+        cursor: pointer;
+        background: #e23b3b;
+        color: white;
+        padding: 6px 10px;
+        border-radius: 6px;
+        border: none;
+    }
 
-        /* Steuerungs-Panel für Größenanpassung */
-        #control-panel {
-            position: fixed;
-            top: 12px;
-            right: 12px;
-            background: rgba(255,255,255,0.9);
-            padding: 10px;
-            border-radius: 8px;
-            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
-            z-index: 3000;
-            font-size: 14px;
-        }
+    /* Steuerungs-Panel für Größenanpassung */
+    #control-panel {
+        position: fixed;
+        top: 12px;
+        right: 12px;
+        background: rgba(255,255,255,0.9);
+        padding: 10px;
+        border-radius: 8px;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        z-index: 3000;
+        font-size: 14px;
+    }
 
-        #control-panel h4 { margin: 2px 0 8px 0; }
-        .control-row { display:flex; align-items:center; gap:8px; margin-bottom:6px; }
-        .control-row label { min-width:70px; }
-        .control-row input[type=range] { width:120px; }
-        .control-row .value { min-width:40px; text-align:right; }
+    #control-panel h4 { margin: 2px 0 8px 0; }
+    .control-row { display:flex; align-items:center; gap:8px; margin-bottom:6px; }
+    .control-row label { min-width:70px; }
+    .control-row input[type=range] { width:120px; }
+    .control-row .value { min-width:40px; text-align:right; }
 
-        /* kleines Hilfs-Icon */
-        .help { font-size:12px; color:#333; opacity:0.8; }
+    /* kleines Hilfs-Icon */
+    .help { font-size:12px; color:#333; opacity:0.8; }
 
-        @media (max-width:480px){
-            #control-panel { right:6px; left:6px; }
-        }
-    </style>
+    /* Tooltip per data-tooltip (einfach, kein JS benötigt) */
+.has-tooltip {
+  position: relative;
+  outline: none;
+}
+
+/* Tooltip-Text */
+.has-tooltip::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 8px);
+  transform: translateX(-50%);
+  background: rgba(0,0,0,0.85);
+  color: #fff;
+  padding: 6px 8px;
+  border-radius: 5px;
+  white-space: nowrap;
+  font-size: 13px;
+  line-height: 1.2;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.12s ease, transform 0.12s ease;
+  transform-origin: center bottom;
+  z-index: 9999;
+}
+
+/* Sichtbar beim Hover / Fokus (zugänglich für Tastatur) */
+.has-tooltip:hover::after,
+.has-tooltip:focus::after {
+  opacity: 1;
+  transform: translateX(-50%) translateY(-4px);
+}
+
+    @media (max-width:480px){
+        #control-panel { right:6px; left:6px; }
+    }
+</style>
 </head>
-    
 <body>
 
 <!-- Hotspot 1 (Messbecher) -->
@@ -113,12 +146,41 @@
     <div class="modal">
         <button class="close-btn" onclick="closeModal('modal1')">Schließen</button>
         <h2>Statistik</h2>
-        <p>Hier kannst du Text, Bilder, Videos oder Buttons einfügen. Beispiel-Video:</p>
-        <video controls style="width:100%; max-height:360px;"> 
-            <source src="Medien/beispiel_video.mp4" type="video/mp4">
-            Dein Browser unterstützt kein Video-Tag.
-        </video>
-        <p class="help">(Dieses Modal öffnet sich nur, wenn du auf das entsprechende Hotspot-Bild klickst.)</p>
+
+        <!-- Deskriptive Statistik Button mit Hover-Tooltip -->
+        <div style="margin:12px 0;">
+            <button class="has-tooltip"
+                data-tooltip="Ist die Methode zur systematischen Beschreibung und Verdichtung von Daten mithilfe von Kennzahlen, Tabellen und Grafiken."
+                style="padding:8px 12px; border-radius:6px; border:1px solid #ccc; background:#f5f5f5; cursor:pointer;">
+                Deskriptive Statistik
+            </button>
+        </div>
+
+        <!-- Textblock -->
+        <p>Hier sind ein paar Benennungen, über welche man beim Auswerten von Daten stolpern kann:</p>
+
+        <!-- Buttons für Median, Mittelwert, Modus mit Hover-Tooltips -->
+        <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;">
+            <button class="has-tooltip"
+                data-tooltip="Ist ein statistisches Lagemaß, das den Wert in der Mitte einer nach Größe sortierten Datenreihe angibt."
+                style="padding:8px 12px; border-radius:6px; border:1px solid #ccc; background:#fff; cursor:pointer;">
+                Median
+            </button>
+
+            <button class="has-tooltip"
+                data-tooltip="Auch arithmetisches Mittel genannt, ist ein statistischer Durchschnittswert."
+                style="padding:8px 12px; border-radius:6px; border:1px solid #ccc; background:#fff; cursor:pointer;">
+                Mittelwert
+            </button>
+
+            <button class="has-tooltip"
+                data-tooltip="Auch Modalwert genannt, ist der am Häufigsten vorkommende Wert in einem Datensatz und ein Lagemaß."
+                style="padding:8px 12px; border-radius:6px; border:1px solid #ccc; background:#fff; cursor:pointer;">
+                Modus
+            </button>
+        </div>
+
+        <p class="help" style="margin-top:12px;">Fahre mit der Maus über die Buttons, um die Beschreibungen zu sehen.</p>
     </div>
 </div>
 
@@ -203,64 +265,64 @@
     <div class="help">Ziehe die Regler, um die Breite (px) der Hotspot-Bilder anzupassen.</div>-->
 </div>
 
-    <script>
-        // Hilfsfunktionen zum Öffnen/Schließen des Modals
-        function openModal(id) {
-            document.getElementById(id).style.display = 'flex';
-        }
-        function closeModal(id) {
-            document.getElementById(id).style.display = 'none';
-        }
+<script>
+    // Hilfsfunktionen zum Öffnen/Schließen des Modals
+    function openModal(id) {
+        document.getElementById(id).style.display = 'flex';
+    }
+    function closeModal(id) {
+        document.getElementById(id).style.display = 'none';
+    }
 
-        // Allgemeine Setup-Funktion für Hotspots
-        function setupHotspot(hotspotId, modalId) {
-            const el = document.getElementById(hotspotId);
+    // Allgemeine Setup-Funktion für Hotspots
+    function setupHotspot(hotspotId, modalId) {
+        const el = document.getElementById(hotspotId);
+        if(!el) return;
+        el.addEventListener('click', function(e){
+            const openSrc = el.getAttribute('data-open-src');
+            if(openSrc) el.src = openSrc; // Bildquelle ändern
+            openModal(modalId); // passendes Modal öffnen
+            e.stopPropagation();
+        });
+    }
+
+    setupHotspot('hotspot1', 'modal1');
+    setupHotspot('hotspot2', 'modal2');
+    setupHotspot('hotspot3', 'modal3');
+    setupHotspot('hotspot4', 'modal4');
+
+    // Größensteuerung: ändert die CSS width des Bildes
+    function setSize(hotspotId, px) {
+        const el = document.getElementById(hotspotId);
+        if(!el) return;
+        el.style.width = px + 'px';
+        // Update Wert-Anzeige
+        const val = document.getElementById('val' + hotspotId.replace('hotspot',''));
+        if(val) val.textContent = px + 'px';
+    }
+
+    // Initiale Werte in Anzeige setzen (falls Styles inline geändert wurden)
+    document.addEventListener('DOMContentLoaded', function(){
+        ['hotspot1','hotspot2','hotspot3','hotspot4'].forEach(function(id){
+            const el = document.getElementById(id);
             if(!el) return;
-            el.addEventListener('click', function(e){
-                const openSrc = el.getAttribute('data-open-src');
-                if(openSrc) el.src = openSrc; // Bildquelle ändern
-                openModal(modalId); // passendes Modal öffnen
-                e.stopPropagation();
-            });
-        }
-
-        setupHotspot('hotspot1', 'modal1');
-        setupHotspot('hotspot2', 'modal2');
-        setupHotspot('hotspot3', 'modal3');
-        setupHotspot('hotspot4', 'modal4');
-
-        // Größensteuerung: ändert die CSS width des Bildes
-        function setSize(hotspotId, px) {
-            const el = document.getElementById(hotspotId);
-            if(!el) return;
-            el.style.width = px + 'px';
-            // Update Wert-Anzeige
-            const val = document.getElementById('val' + hotspotId.replace('hotspot',''));
+            const px = parseInt(getComputedStyle(el).width,10);
+            const idx = id.replace('hotspot','');
+            const range = document.getElementById('size' + idx);
+            const val = document.getElementById('val' + idx);
+            if(range) range.value = px;
             if(val) val.textContent = px + 'px';
-        }
-
-        // Initiale Werte in Anzeige setzen (falls Styles inline geändert wurden)
-        document.addEventListener('DOMContentLoaded', function(){
-            ['hotspot1','hotspot2','hotspot3','hotspot4'].forEach(function(id){
-                const el = document.getElementById(id);
-                if(!el) return;
-                const px = parseInt(getComputedStyle(el).width,10);
-                const idx = id.replace('hotspot','');
-                const range = document.getElementById('size' + idx);
-                const val = document.getElementById('val' + idx);
-                if(range) range.value = px;
-                if(val) val.textContent = px + 'px';
-            });
         });
+    });
 
-        // Schließen des Modals wenn außerhalb des Modal-Box geklickt wird
-        document.querySelectorAll('.modal-overlay').forEach(function(overlay){
-            overlay.addEventListener('click', function(e){
-                if(e.target === overlay) overlay.style.display = 'none';
-            });
+    // Schließen des Modals wenn außerhalb des Modal-Box geklickt wird
+    document.querySelectorAll('.modal-overlay').forEach(function(overlay){
+        overlay.addEventListener('click', function(e){
+            if(e.target === overlay) overlay.style.display = 'none';
         });
+    });
 
-    </script>
+</script>
 
 </body>
 </html>
