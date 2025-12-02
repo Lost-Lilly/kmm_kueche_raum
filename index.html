@@ -21,7 +21,13 @@
         position: relative; /* Referenz für absolute Hotspots */
         font-family: Arial, sans-serif;
         color: #222;
-    }
+        transition: background-image 900ms ease-in-out, background-color 900ms ease-in-out;
+}
+/*Hintergrund ändern*/
+body.all-hotspots-done {
+background-image: url('Medien/Raum_ende.jpg');
+background-color: #111;
+}
 
     /* Hotspots: absolute Positionierung + zentriert an (left,top) */
     .hotspot {
@@ -70,35 +76,19 @@
         border: none;
     }
 
-     /* Steuerungs-Panel für Größenanpassung *//*
-    #control-panel {
-        position: fixed;
-        top: 12px;
-        right: 12px;
-        background: rgba(255,255,255,0.9);
-        padding: 10px;
-        border-radius: 8px;
-        box-shadow: 0 6px 20px rgba(0,0,0,0.15);
-        z-index: 3000;
-        font-size: 14px;
-    }*/
-
     #control-panel h4 { margin: 2px 0 8px 0; }
     .control-row { display:flex; align-items:center; gap:8px; margin-bottom:6px; }
     .control-row label { min-width:70px; }
     .control-row input[type=range] { width:120px; }
     .control-row .value { min-width:40px; text-align:right; }
 
-    /* kleines Hilfs-Icon */
     .help { font-size:12px; color:#333; opacity:0.8; }
 
-    /* Tooltip per data-tooltip (einfach, kein JS benötigt) */
 .has-tooltip {
   position: relative;
   outline: none;
 }
 
-/* Tooltip-Text */
 .has-tooltip::after {
   content: attr(data-tooltip);
   position: absolute;
@@ -119,7 +109,6 @@
   z-index: 9999;
 }
 
-/* Sichtbar beim Hover / Fokus (zugänglich für Tastatur) */
 .has-tooltip:hover::after,
 .has-tooltip:focus::after {
   opacity: 1;
@@ -141,27 +130,22 @@
         transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
     }
 
-    /* Hover: leichte Anhebung + Hintergrundfarbe */
     .link-button:hover {
         transform: translateY(-4px);
         background: linear-gradient(180deg, #ffffff, #fbfbfb);
         box-shadow: 0 8px 24px rgba(0,0,0,0.08);
     }
 
-    /* Fokus: sichtbarer Fokusring (Barrierefreiheit) */
     .link-button:focus {
         outline: 3px solid rgba(63,132,255,0.25);
         outline-offset: 3px;
     }
 
-    /* Für Browser, die :focus-visible unterstützen - nur dann den Ring zeigen */
     .link-button:focus:not(:focus-visible) {
         outline: none;
     }
 
-    /* Kleine Icon-Box in Buttons */
     .link-button svg { flex: 0 0 36px; height:36px; width:36px; }
-
 
   /* Audio-Button (Modal 4) */
     .audio-button {
@@ -182,13 +166,10 @@
     .audio-button:focus { outline: 3px solid rgba(43,124,255,0.25); outline-offset: 3px; }
     .audio-button:active { transform: translateY(0); }
 
-    /* Kleine Formatierung für Interview */
     .interview p { margin:6px 0; }
     .interview .speaker { font-weight:700; }
     .konjunktiv { margin-top:12px; background:#fafafa; padding:10px; border-radius:6px; border:1px solid #eee; }
 
-
-    /* Warnung box (Modal 5) */
     .warning-box {
         background: #fff4e6;
         border-left: 6px solid #ff9a00;
@@ -203,7 +184,6 @@
     }
     .warning-list { margin:0; padding-left:18px; }
 
-    /* Center area with image and overlay dots */
     .image-area {
         display:flex;
         justify-content:center;
@@ -224,7 +204,6 @@
         box-shadow: 0 8px 20px rgba(0,0,0,0.12);
     }
 
-    /* Dots mit Info bei hover */
     .info-dot {
         position:absolute;
         width:18px;
@@ -238,7 +217,6 @@
     }
     .info-dot:hover { transform: scale(1.25); background: rgba(90, 255, 244, 0.28); }
 
-    /* Tooltip für dots */
     .info-dot .dot-tip {
         display:none;
         position:absolute;
@@ -259,7 +237,6 @@
         display:block;
     }
 
-    /* kleine infobox (Modal 5) */
     .infobox {
         margin-top:12px;
         padding:10px;
@@ -269,11 +246,11 @@
         color:#589fb8;
     }
 
-    /* keep consistent tooltip style from earlier */
     .has-tooltip {
       position: relative;
       outline: none;
     }
+
     .has-tooltip::after {
       content: attr(data-tooltip);
       position: absolute;
@@ -298,6 +275,17 @@
       transform: translateX(-50%) translateY(-4px);
     }
 
+    /* Video-spezifische Styles */
+    .video-container {
+        display:flex;
+        flex-direction:column;
+        gap:10px;
+        margin-top:10px;
+    }
+    .video-controls { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+    .video-controls button { padding:8px 10px; border-radius:6px; border:1px solid #ccc; background:#fff; cursor:pointer; }
+    .video-controls button:focus { outline:3px solid rgba(63,132,255,0.18); }
+
     @media (max-width:640px) {
         .image-wrapper { width: 92%; }
         .info-dot { width:14px; height:14px; }
@@ -306,10 +294,15 @@
 </head>
 <body>
 
-<!-- existing hotspots... -->
 
 <!-- Hotspot 1 (Messbecher) -->
-<img id="hotspot1" class="hotspot" src="Medien/Messbecher.png" data-open-src="Medien/Messbecher1.png" alt="Messbecher" style="left:40%; top:40%; width:80px;">
+<img id="hotspot1" 
+class="hotspot" 
+src="Medien/Messbecher.png" 
+data-open-src="Medien/Messbecher1.png" 
+alt="Messbecher" 
+style="left:40%; top:43%; width:60px;">
+
 <!-- Modal 1 -->
 <div class="modal-overlay" id="modal1">
     <div class="modal">
@@ -336,8 +329,19 @@
     </div>
 </div>
 
+
+
+
+
+
+
 <!-- Hotspot 2 (Salzstreuer) -->
-<img id="hotspot2" class="hotspot" src="Medien/Salzstreuer.png" data-open-src="Medien/Salzstreuer1.png" alt="Salzstreuer" style="left:23%; top:12%; width:20px;">
+<img id="hotspot2" 
+class="hotspot" 
+src="Medien/Salzstreuer.png" 
+data-open-src="Medien/Salzstreuer1.png" 
+alt="Salzstreuer" 
+style="left:23%; top:12%; width:20px;">
 <!-- Modal 2 -->
 <div class="modal-overlay" id="modal2">
   <div class="modal">
@@ -369,8 +373,20 @@
   </div>
 </div>
 
+
+
+
+
+
+
+
 <!-- Hotspot 3 (Teller) -->
-<img id="hotspot3" class="hotspot" src="Medien/Teller.png" data-open-src="Medien/Teller1.png" alt="Teller" style="left:80%; top:60%; width: 80px;">
+<img id="hotspot3" 
+class="hotspot" 
+src="Medien/Teller.png" 
+data-open-src="Medien/Teller1.png" 
+alt="Teller" 
+style="left:80%; top:60%; width: 80px;">
 <!-- Modal 3 -->
 <div class="modal-overlay" id="modal3">
   <div class="modal">
@@ -418,7 +434,7 @@
 
     <p style="margin-top:12px;">Es gibt auch gute kostenfreie Alternativen zu den Programmen.</p>
 
-    <!-- Kostenfreie Alternativen als Buttons -->
+    <!-- Kostenfreie Alternativen Buttons -->
     <div style="display:flex; flex-direction:column; gap:8px; margin-top:8px;">
         <a class="link-button" href="https://www.canva.com/de_de/herunterladen/windows/" target="_blank">
             <svg width="36" height="36" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img">
@@ -445,8 +461,20 @@
   </div>
 </div>
 
+
+
+
+
+
+
+
 <!-- Hotspot 4 (Schneidebrett) -->
-<img id="hotspot4" class="hotspot" src="Medien/Schneidebrett.png" data-open-src="Medien/Schneidebrett1.png" alt="Schneidebrett" style="left:90%; top:60%; width:150px;">
+<img id="hotspot4" 
+class="hotspot" 
+src="Medien/Schneidebrett.png" 
+data-open-src="Medien/Schneidebrett1.png" 
+alt="Schneidebrett" 
+style="left:90%; top:60%; width:150px;">
 <!-- Modal 4 -->
 <div class="modal-overlay" id="modal4">
   <div class="modal">
@@ -489,14 +517,23 @@
   </div>
 </div>
 
+
+
+
+
+
 <!-- Hotspot 5 (Anleitung) -->
-<img id="hotspot5" class="hotspot" src="Medien/Anleitung.png" data-open-src="Medien/Anleitung1.png" alt="Anleitung" style="left:62%; top:10%; width:40px;">
+<img id="hotspot5" 
+class="hotspot" 
+src="Medien/Anleitung.png" 
+data-open-src="Medien/Anleitung1.png" 
+alt="Anleitung" 
+style="left:62%; top:10%; width:40px;">
 <!-- Modal 5 -->
 <div class="modal-overlay" id="modal5">
   <div class="modal">
     <button class="close-btn" onclick="closeModal('modal5')">Schließen</button>
-    <h1>Technische Dokumentation 1</h1>
-    <h2>Anleitung</h2>
+    <h2> Technische Dokumentation 1</h2>
 
     <!-- Warning box with two warnings -->
     <div class="warning-box" role="alert" aria-live="polite">
@@ -507,7 +544,7 @@
       </ul>
     </div>
 
-    <!-- Central image with three semi-transparent points -->
+    <!-- Central image mit 3 semi-transparent dots -->
     <div class="image-area" aria-hidden="false">
       <div class="image-wrapper" role="img" aria-label="Toaster mit Informationspunkten">
         <img src="Medien/Toaster.png" alt="Toaster Abbildung">
@@ -526,7 +563,7 @@
       </div>
     </div>
 
-    <!-- Small infobox about Funktionsdesign -->
+    <!--  infobox Funktionsdesign -->
     <div class="infobox" role="note" aria-live="polite">
       <strong>Was ist Funktionsdesign?</strong>
       <p style="margin:6px 0 0 0;">Funktionsdesign ist eine Standardisierungs- und Strukturierungsmethode für die Technische Dokumentation und Technische Kommunikation, welche auch bei Anleitungen eine besondere Rolle spielt.</p>
@@ -535,39 +572,363 @@
   </div>
 </div>
 
+
+
+
+
+
+
+
+<!--  Hotspot 6 (Wecker) -->
+<img id="hotspot6" 
+class="hotspot" 
+src="Medien/Wecker.png" 
+data-open-src="Medien/Wecker1.png" 
+alt="Wecker" 
+style="left:60%; top:43%; width:46px;">
+<!-- Modal 6: Hilfetext + Video mit Zeitstempeln -->
+<div class="modal-overlay" id="modal6">
+  <div class="modal">
+    <button class="close-btn" onclick="closeModal('modal6')">Schließen</button>
+    <h2>IT Grundlagen 1</h2>
+
+    <!-- Hilfetext -->
+    <p style="margin-top:6px;">Wie kann man mit VBA ein kleines Spiel in Word programmieren? Das Video bietet eine Schritt-für-Schritt Anleitung</p>
+
+    <!-- Video-Bereich mit Steuerung für Sprünge zu Zeitstempeln -->
+    <div class="video-container">
+        <video id="help-video" controls preload="metadata" style="max-width:100%; border-radius:8px; background:#000;">
+            <source src="Medien/vba.mp4" type="video/mp4">
+            Dein Browser unterstützt das Video-Tag nicht.
+        </video>
+
+        <!-- Benutzerfreundliche Sprung-Steuerungen -->
+        <div class="video-controls" role="toolbar" aria-label="Video Sprungsteuerung">
+            <!-- Einige praktische Sprungmarken (Beispiel: 0:00, 0:30, 1:15, 2:00) -->
+            <button type="button" data-seconds="0" class="jump-to">Start (0:00)</button>
+            <button type="button" data-seconds="30" class="jump-to">0:30</button>
+            <button type="button" data-seconds="75" class="jump-to">1:15</button>
+            <button type="button" data-seconds="120" class="jump-to">2:00</button>
+
+            <!-- Kleine Sprung-Buttons +/- 10s sowie Play -->
+            <button type="button" id="back-10">« -10s</button>
+            <button type="button" id="play-pause">▶ Play</button>
+            <button type="button" id="forward-10">+10s »</button>
+
+            <!-- Anzeige der aktuellen Zeit (wird dynamisch aktualisiert) -->
+            <div id="time-display" aria-live="polite" style="margin-left:8px; min-width:80px; text-align:left;">0:00 / 0:00</div>
+        </div>
+    </div>
+
+  </div>
+</div>
+
+
+
+
+
+<!-- Hotspot 7 (Mixer) -->
+<img id="hotspot7" 
+class="hotspot" 
+src="Medien/Mixer.png" 
+data-open-src="Medien/Mixer1.png" 
+alt="Mixer" 
+style="left:35%; top:40%; width:80px;">
+
+<!-- Modal 7 -->
+<div class="modal-overlay" id="modal7">
+    <div class="modal">
+        <button class="close-btn" onclick="closeModal('modal7')">Schließen</button>
+        <h2>IT Grundlagen 2</h2>
+
+        <div style="margin:12px 0;">
+            <button class="has-tooltip" data-tooltip="Ist die Methode zur systematischen Beschreibung und Verdichtung von Daten mithilfe von Kennzahlen, Tabellen und Grafiken." style="padding:8px 12px; border-radius:6px; border:1px solid #ccc; background:#f5f5f5; cursor:pointer;">
+                Deskriptive Statistik
+            </button>
+        </div>
+
+        <p>Hier sind ein paar Benennungen, über welche man beim Auswerten von Daten stolpern kann:</p>
+
+        <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;">
+            <button class="has-tooltip" data-tooltip="Ist ein statistisches Lagemaß, das den Wert in der Mitte einer nach Größe sortierten Datenreihe angibt." style="padding:8px 12px; border-radius:6px; border:1px solid #ccc; background:#fff; cursor:pointer;">Median</button>
+
+            <button class="has-tooltip" data-tooltip="Auch arithmetisches Mittel genannt, ist ein statistischer Durchschnittswert." style="padding:8px 12px; border-radius:6px; border:1px solid #ccc; background:#fff; cursor:pointer;">Mittelwert</button>
+
+            <button class="has-tooltip" data-tooltip="Auch Modalwert genannt, ist der am Häufigsten vorkommende Wert in einem Datensatz und ein Lagemaß." style="padding:8px 12px; border-radius:6px; border:1px solid #ccc; background:#fff; cursor:pointer;">Modus</button>
+        </div>
+
+        <p class="help" style="margin-top:12px;">Fahre mit der Maus über die Buttons, um die Beschreibungen zu sehen.</p>
+    </div>
+</div>
+
+
+
+
+
+
+<!-- Hotspot 8 (Salzstreuer) -->
+<img id="hotspot8" 
+class="hotspot" 
+src="Medien/Pfefferstreuer.png" 
+data-open-src="Medien/Pfefferstreuer1.png" 
+alt="Pfefferstreuer" 
+style="left:25%; top:12%; width:20px;">
+<!-- Modal 8 -->
+<div class="modal-overlay" id="modal8">
+  <div class="modal">
+    <button class="close-btn" onclick="closeModal('modal8')">Schließen</button>
+    <h2>Sprachwissenschaften 2</h2>
+
+    <p>...</p>
+
+    <div style="overflow:auto; margin-top:8px;">
+      <table style="width:100%; border-collapse:collapse;">
+        <thead>
+          <tr style="background:#f2f2f2; text-align:left;">
+            <th style="padding:8px; border:1px solid #ddd; width:35%;">Art</th>
+            <th style="padding:8px; border:1px solid #ddd;">Beispiel</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td style="padding:8px; border:1px solid #ddd;">...</td><td style="padding:8px; border:1px solid #ddd;">...</td></tr>
+          <tr><td style="padding:8px; border:1px solid #ddd;">...</td><td style="padding:8px; border:1px solid #ddd;">...</td></tr>
+          <tr><td style="padding:8px; border:1px solid #ddd;">...</td><td style="padding:8px; border:1px solid #ddd;">...</td></tr>
+          <tr><td style="padding:8px; border:1px solid #ddd;">...</td><td style="padding:8px; border:1px solid #ddd;">...</td></tr>
+          <tr><td style="padding:8px; border:1px solid #ddd;">...</td><td style="padding:8px; border:1px solid #ddd;">...</td></tr>
+          <tr><td style="padding:8px; border:1px solid #ddd;">...</td><td style="padding:8px; border:1px solid #ddd;">...</td></tr>
+          <tr><td style="padding:8px; border:1px solid #ddd;">...</td><td style="padding:8px; border:1px solid #ddd;">...</td></tr>
+          <tr><td style="padding:8px; border:1px solid #ddd;">...</td><td style="padding:8px; border:1px solid #ddd;">...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+<!--  Hotspot 9 (Schöpfkelle) -->
+<img id="hotspot9" 
+class="hotspot" 
+src="Medien/Kelle.png" 
+data-open-src="Medien/Kelle1.png" 
+alt="Kelle" 
+style="left:50%; top:36%; width:40px;">
+<!-- Modal 9 -->
+<div class="modal-overlay" id="modal9">
+  <div class="modal">
+    <button class="close-btn" onclick="closeModal('modal9')">Schließen</button>
+    <h2>IT Grundlagen 1</h2>
+
+    <!-- Hilfetext -->
+    <p style="margin-top:6px;">Wie wurde der Toaster erstellt? Hier ist eine Anleitung um schnell Illustrationen zu erstellen.</p>
+
+    <!-- Video-Bereich mit Steuerung für Sprünge zu Zeitstempeln -->
+    <div class="video-container">
+        <video id="help-video" controls preload="metadata" style="max-width:100%; border-radius:8px; background:#000;">
+            <source src="Medien/illustration.mp4" type="video/mp4">
+            Dein Browser unterstützt das Video-Tag nicht.
+        </video>
+
+        <!-- Benutzerfreundliche Sprung-Steuerungen -->
+        <div class="video-controls" role="toolbar" aria-label="Video Sprungsteuerung">
+            <!-- Einige praktische Sprungmarken (Beispiel: 0:00, 0:30, 1:15, 2:00) -->
+            <button type="button" data-seconds="0" class="jump-to">Start (0:00)</button>
+            <button type="button" data-seconds="30" class="jump-to">0:30</button>
+            <button type="button" data-seconds="75" class="jump-to">1:15</button>
+            <button type="button" data-seconds="120" class="jump-to">2:00</button>
+
+            <!-- Kleine Sprung-Buttons +/- 10s sowie Play -->
+            <button type="button" id="back-10">« -10s</button>
+            <button type="button" id="play-pause">▶ Play</button>
+            <button type="button" id="forward-10">+10s »</button>
+
+            <!-- Anzeige der aktuellen Zeit (wird dynamisch aktualisiert) -->
+            <div id="time-display" aria-live="polite" style="margin-left:8px; min-width:80px; text-align:left;">0:00 / 0:00</div>
+        </div>
+    </div>
+
+  </div>
+</div>
+
+
+
+
+
+
+
+
+<!-- Hotspot 10 (Rezept) -->
+<img id="hotspot10" 
+class="hotspot" 
+src="Medien/Rezept.png" 
+data-open-src="Medien/Rezept1.png" 
+alt="Rezept" 
+style="left:60%; top:10%; width:32px;">
+<!-- Modal 10 -->
+<div class="modal-overlay" id="modal10">
+  <div class="modal">
+    <button class="close-btn" onclick="closeModal('modal10')">Schließen</button>
+    <h2>Technische Dokumentation 2</h2>
+
+    <!-- Warning box with two warnings -->
+    <div class="warning-box" role="alert" aria-live="polite">
+      <div class="warn">Warnhinweise zum Toaster</div>
+      <ul class="warning-list">
+        <li><strong></strong> Ziehe niemals das Netzkabel am Gerät, wenn es funktionsgestört ist. Trenne das Gerät vorher vom Stromnetz.</li>
+        <li><strong></strong> Benutze den Toaster nicht in der Nähe von Wasser oder feuchten Flächen — Gefahr eines elektrischen Schlages.</li>
+      </ul>
+    </div>
+
+    <!-- Central image mit 3 semi-transparent dots -->
+    <div class="image-area" aria-hidden="false">
+      <div class="image-wrapper" role="img" aria-label="Toaster mit Informationspunkten">
+        <img src="Medien/Toaster.png" alt="Toaster Abbildung">
+        <!-- Dot 1 (links unten) -->
+        <div class="info-dot" style="left:18%; top:87%;" tabindex="0" aria-describedby="dot1">
+          <div class="dot-tip" id="dot1">Stecker: Vor dem Reinigen immer vom Strom trennen.</div>
+        </div>
+        <!-- Dot 2 (Mitte) -->
+        <div class="info-dot" style="left:50%; top:50%;" tabindex="0" aria-describedby="dot2">
+          <div class="dot-tip" id="dot2">Schlitze: Krümel regelmäßig entfernen, um Brandgefahr zu vermeiden.</div>
+        </div>
+        <!-- Dot 3 (rechts oben) -->
+        <div class="info-dot" style="left:82%; top:30%;" tabindex="0" aria-describedby="dot3">
+          <div class="dot-tip" id="dot3">Gehäuse: Nicht mit scharfen Reinigungsmitteln behandeln.</div>
+        </div>
+      </div>
+    </div>
+
+    <!--  infobox Funktionsdesign -->
+    <div class="infobox" role="note" aria-live="polite">
+      <strong>Was ist Funktionsdesign?</strong>
+      <p style="margin:6px 0 0 0;">Funktionsdesign ist eine Standardisierungs- und Strukturierungsmethode für die Technische Dokumentation und Technische Kommunikation, welche auch bei Anleitungen eine besondere Rolle spielt.</p>
+    </div>
+
+  </div>
+</div>
+
+
+
+
+
+
+
+<!--  Hotspot 11 (Sieb) -->
+<img id="hotspot11" 
+class="hotspot" 
+src="Medien/Sieb.png" 
+data-open-src="Medien/Sieb1.png" 
+alt="Sieb" 
+style="left:54%; top:36%; width:40px;">
+<!-- Modal 11 -->
+<div class="modal-overlay" id="modal11">
+  <div class="modal">
+    <button class="close-btn" onclick="closeModal('modal11')">Schließen</button>
+    <h2>IT Grundlagen 1</h2>
+
+    <!-- Hilfetext -->
+    <p style="margin-top:6px;">Wie wurde der Toaster erstellt? Hier ist eine Anleitung um schnell Illustrationen zu erstellen.</p>
+
+    <!-- Video-Bereich mit Steuerung für Sprünge zu Zeitstempeln -->
+    <div class="video-container">
+        <video id="help-video" controls preload="metadata" style="max-width:100%; border-radius:8px; background:#000;">
+            <source src="Medien/photobearbeitung.mp4" type="video/mp4">
+            Dein Browser unterstützt das Video-Tag nicht.
+        </video>
+
+        <!-- Benutzerfreundliche Sprung-Steuerungen -->
+        <div class="video-controls" role="toolbar" aria-label="Video Sprungsteuerung">
+            <!-- Einige praktische Sprungmarken (Beispiel: 0:00, 0:30, 1:15, 2:00) -->
+            <button type="button" data-seconds="0" class="jump-to">Start (0:00)</button>
+            <button type="button" data-seconds="30" class="jump-to">0:30</button>
+            <button type="button" data-seconds="75" class="jump-to">1:15</button>
+            <button type="button" data-seconds="120" class="jump-to">2:00</button>
+
+            <!-- Kleine Sprung-Buttons +/- 10s sowie Play -->
+            <button type="button" id="back-10">« -10s</button>
+            <button type="button" id="play-pause">▶ Play</button>
+            <button type="button" id="forward-10">+10s »</button>
+
+            <!-- Anzeige der aktuellen Zeit (wird dynamisch aktualisiert) -->
+            <div id="time-display" aria-live="polite" style="margin-left:8px; min-width:80px; text-align:left;">0:00 / 0:00</div>
+        </div>
+    </div>
+
+  </div>
+</div>
+
+
 <script>
-    // Hilfsfunktionen zum Öffnen/Schließen des Modals
+    /* Allgemeine Modal-Funktionen */
+
+    // Öffnet ein Modal (Anzeige 'flex' damit zentriert dargestellt wird)
     function openModal(id) {
         document.getElementById(id).style.display = 'flex';
     }
+
+    // Schließt ein Modal. Bei modal4: Audio stoppen.
     function closeModal(id) {
-        // falls Modal4 Audio läuft, stoppen (sicherheitsmaßnahme)
         if(id === 'modal4') {
             const a = document.getElementById('modal4-audio');
             if(a && !a.paused) { a.pause(); a.currentTime = 0; updateAudioBtn(false); }
         }
+        // Bei modal6 (Video) zusätzlich das Video anhalten und zurücksetzen
+        if(id === 'modal6') {
+            const v = document.getElementById('help-video');
+            if(v && !v.paused) { v.pause(); v.currentTime = 0; }
+            // Falls wir einen aktiven Play-Button-Titel haben, zurücksetzen
+            const playBtn = document.getElementById('play-pause');
+            if(playBtn) playBtn.textContent = '▶ Play';
+        }
+                // Bei modal9 (Video) zusätzlich das Video anhalten und zurücksetzen
+        if(id === 'modal9') {
+            const v = document.getElementById('help-video');
+            if(v && !v.paused) { v.pause(); v.currentTime = 0; }
+            // Falls wir einen aktiven Play-Button-Titel haben, zurücksetzen
+            const playBtn = document.getElementById('play-pause');
+            if(playBtn) playBtn.textContent = '▶ Play';
+        }
+                        // Bei modal11 (Video) zusätzlich das Video anhalten und zurücksetzen
+        if(id === 'modal11') {
+            const v = document.getElementById('help-video');
+            if(v && !v.paused) { v.pause(); v.currentTime = 0; }
+            // Falls wir einen aktiven Play-Button-Titel haben, zurücksetzen
+            const playBtn = document.getElementById('play-pause');
+            if(playBtn) playBtn.textContent = '▶ Play';
+        }
         document.getElementById(id).style.display = 'none';
     }
 
-    // Allgemeine Setup-Funktion für Hotspots
+    /*  Hotspot Setup-Helfer */
     function setupHotspot(hotspotId, modalId) {
         const el = document.getElementById(hotspotId);
         if(!el) return;
         el.addEventListener('click', function(e){
             const openSrc = el.getAttribute('data-open-src');
-            if(openSrc) el.src = openSrc; // Bildquelle ändern (aktiviert)
-            openModal(modalId); // passendes Modal öffnen
+            if(openSrc) el.src = openSrc; // optionales "aktiviertes" Icon
+            openModal(modalId);
             e.stopPropagation();
         });
     }
 
+    // bestehende Hotspots verbinden
     setupHotspot('hotspot1', 'modal1');
     setupHotspot('hotspot2', 'modal2');
     setupHotspot('hotspot3', 'modal3');
     setupHotspot('hotspot4', 'modal4');
-    setupHotspot('hotspot5', 'modal5'); // neuer Hotspot
+    setupHotspot('hotspot5', 'modal5');
+    setupHotspot('hotspot6', 'modal6');
+    setupHotspot('hotspot7', 'modal7');
+    setupHotspot('hotspot8', 'modal8');
+    setupHotspot('hotspot9', 'modal9');
+    setupHotspot('hotspot10', 'modal10');
+    setupHotspot('hotspot11', 'modal11');
 
-    // Audio-Player für Modal 4 (wie vorher)
+
+    /* Audio-Player Logik für Modal 4*/
     (function(){
         const audio = document.getElementById('modal4-audio');
         const btn = document.getElementById('modal4-audio-btn');
@@ -593,32 +954,133 @@
         }
     })();
 
-    // Make info-dots keyboard accessible: show tip on focus (they already show via :focus in CSS if needed)
+
+    /* Info-Dots (Tabbable) - Tastaturzugänglichkeit */
     document.querySelectorAll('.info-dot').forEach(function(dot){
         dot.addEventListener('keydown', function(e){
-            // allow Enter or Space to toggle showing tooltip (focus already shows via CSS)
             if(e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
-                // simple visual feedback: pulse
                 dot.style.transform = (dot.style.transform.includes('scale(1.25)')) ? '' : 'scale(1.25)';
                 setTimeout(()=>{ dot.style.transform=''; }, 350);
             }
         });
     });
 
-    // Schließen des Modals wenn außerhalb des Modal-Box geklickt wird
+
+    /* Overlay-Klick schließt Modal (wenn auf Hintergrund geklickt wird)*/
     document.querySelectorAll('.modal-overlay').forEach(function(overlay){
         overlay.addEventListener('click', function(e){
             if(e.target === overlay) overlay.style.display = 'none';
         });
     });
 
-    // optional: stop audio when switching away from modal4
+
+    /* ESC-Taste: Alle Modals schließen + Audio/Video stoppen */
     document.addEventListener('keydown', function(e){
         if(e.key === 'Escape') {
             document.querySelectorAll('.modal-overlay').forEach(m => m.style.display = 'none');
+
             const a = document.getElementById('modal4-audio');
             if(a && !a.paused) { a.pause(); a.currentTime = 0; updateAudioBtn(false); }
+
+            const v = document.getElementById('help-video');
+            if(v && !v.paused) { v.pause(); v.currentTime = 0; const playBtn = document.getElementById('play-pause'); if(playBtn) playBtn.textContent = '▶ Play'; }
+        }
+    });
+
+
+    /* ----------------------------
+       SPEZIELLE VIDEO-LOGIK FÜR MODAL 6
+       - Sprung-Buttons (via data-seconds)
+       - Back/Forward 10s
+       - Play/Pause Toggle
+       - Zeit-Anzeige (aktuelle Zeit / Dauer)
+       - Barrierefreiheit: aria-live für Zeit
+       ---------------------------- */
+    (function(){
+        const video = document.getElementById('help-video');
+        if(!video) return; // Falls Video nicht vorhanden, nichts tun
+
+        const jumpBtns = document.querySelectorAll('#modal6 .jump-to');
+        const back10 = document.getElementById('back-10');
+        const forward10 = document.getElementById('forward-10');
+        const playPause = document.getElementById('play-pause');
+        const timeDisplay = document.getElementById('time-display');
+
+        // Hilfsfunktion: Sekunden in M:SS umwandeln
+        function fmt(s){
+            if(isNaN(s)) return '0:00';
+            const m = Math.floor(s/60);
+            const sec = Math.floor(s%60);
+            return m + ':' + (sec<10 ? '0'+sec : sec);
+        }
+
+        // Aktualisiert die Anzeige (z. B. "0:10 / 2:30")
+        function updateTimeDisplay(){
+            const cur = fmt(video.currentTime);
+            const dur = isNaN(video.duration) ? '0:00' : fmt(video.duration);
+            if(timeDisplay) timeDisplay.textContent = cur + ' / ' + dur;
+        }
+
+        // Springt zu einer bestimmten Zeit (Sekunden) und spielt an
+        function jumpTo(seconds){
+            // clamp, um außerhalb der Dauer zu vermeiden
+            const target = Math.max(0, Math.min(seconds, video.duration || seconds));
+            video.currentTime = target;
+            video.play().catch(err => { /* play kann fehlschlagen (Autoplay-Policy) */ });
+        }
+
+        // Sprung-Buttons mit data-seconds verbinden
+        jumpBtns.forEach(btn => {
+            btn.addEventListener('click', function(){
+                const s = Number(btn.getAttribute('data-seconds'));
+                if(!isNaN(s)) jumpTo(s);
+            });
+        });
+
+        // -10s
+        back10.addEventListener('click', function(){
+            jumpTo((video.currentTime || 0) - 10);
+        });
+        // +10s
+        forward10.addEventListener('click', function(){
+            jumpTo((video.currentTime || 0) + 10);
+        });
+
+        // Play / Pause Toggle
+        playPause.addEventListener('click', function(){
+            if(video.paused) {
+                video.play().then(()=>{ playPause.textContent = '❚❚ Pause'; }).catch(()=>{ /* ignore */ });
+            } else {
+                video.pause();
+                playPause.textContent = '▶ Play';
+            }
+        });
+
+        // Video Events: Update Zeit-Anzeige
+        video.addEventListener('timeupdate', updateTimeDisplay);
+        video.addEventListener('loadedmetadata', updateTimeDisplay);
+        video.addEventListener('ended', function(){ if(playPause) playPause.textContent = '▶ Play'; updateTimeDisplay(); });
+
+        // Wenn das Modal6 geschlossen wird (durch closeModal) → Video wird dort bereits gestoppt.
+
+    })();
+
+    /* HINTERGRUND ÄNDERN, WENN ALLE HOTSPOTS GEKLICKT WURDEN */
+
+    const hotspotIds = ['hotspot1','hotspot2','hotspot3','hotspot4','hotspot5','hotspot6','hotspot7','hotspot8','hotspot9','hotspot10','hotspot11'];
+    const clickedHotspots = new Set();
+
+    // bestehendes setupHotspot erweitern → nach dem Öffnen registrieren
+    hotspotIds.forEach(id => {
+        const el = document.getElementById(id);
+        if(el){
+            el.addEventListener('click', () => {
+                clickedHotspots.add(id);
+                if(clickedHotspots.size === hotspotIds.length){
+                    document.body.classList.add('all-hotspots-done');
+                }
+            });
         }
     });
 </script>
