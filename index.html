@@ -181,9 +181,119 @@
     .audio-button:focus { outline: 3px solid rgba(43,124,255,0.25); outline-offset: 3px; }
     .audio-button:active { transform: translateY(0); }
 
-    @media (max-width:480px){
-        #control-panel { right:6px; left:6px; }
-        .link-button { padding:10px; }
+/* Warnung box */
+    .warning-box {
+        background: #fff4e6;
+        border-left: 6px solid #ff9a00;
+        padding: 12px;
+        border-radius: 6px;
+        margin-bottom: 12px;
+    }
+    .warning-box .warn {
+        font-weight:700;
+        color:#8a3b00;
+        margin-bottom:6px;
+    }
+    .warning-list { margin:0; padding-left:18px; }
+
+    /* Center area image and drüber dots */
+    .image-area {
+        display:flex;
+        justify-content:center;
+        margin:18px 0;
+    }
+    .image-wrapper {
+        position:relative;
+        width: 420px;
+        max-width: 90%;
+        border-radius:8px;
+        overflow:visible;
+    }
+    .image-wrapper img {
+        display:block;
+        width:100%;
+        height:auto;
+        border-radius:6px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+    }
+
+    /* Dots bei hover */
+    .info-dot {
+        position:absolute;
+        width:18px;
+        height:18px;
+        border-radius:50%;
+        background: rgba(43,124,255,0.18);
+        border: 2px solid rgba(43,124,255,0.6);
+        backdrop-filter: blur(1px);
+        cursor: default;
+        transition: transform 0.12s ease, background 0.12s ease;
+    }
+    .info-dot:hover { transform: scale(1.25); background: rgba(43,124,255,0.28); }
+
+    /* Tooltip für dots */
+    .info-dot .dot-tip {
+        display:none;
+        position:absolute;
+        left:50%;
+        transform:translateX(-50%);
+        bottom:calc(100% + 8px);
+        background: rgba(0,0,0,0.85);
+        color:#fff;
+        padding:8px 10px;
+        border-radius:6px;
+        font-size:13px;
+        white-space:nowrap;
+        z-index:50;
+        pointer-events:none;
+    }
+    .info-dot:hover .dot-tip,
+    .info-dot:focus .dot-tip {
+        display:block;
+    }
+
+    /* small infobox */
+    .infobox {
+        margin-top:12px;
+        padding:10px;
+        border-radius:8px;
+        background:#f5f8ff;
+        border:1px solid #dbe9ff;
+        color:#08306b;
+    }
+
+    /* keep consistent tooltip style from earlier */
+    .has-tooltip {
+      position: relative;
+      outline: none;
+    }
+    .has-tooltip::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      left: 50%;
+      bottom: calc(100% + 8px);
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.85);
+      color: #fff;
+      padding: 6px 8px;
+      border-radius: 5px;
+      white-space: nowrap;
+      font-size: 13px;
+      line-height: 1.2;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.12s ease, transform 0.12s ease;
+      z-index: 9999;
+    }
+    .has-tooltip:hover::after,
+    .has-tooltip:focus::after {
+      opacity: 1;
+      transform: translateX(-50%) translateY(-4px);
+    }
+
+    @media (max-width:640px) {
+        .image-wrapper { width: 92%; }
+        .info-dot { width:14px; height:14px; }
     }
 
     /* Kleine Formatierung für Interview */
