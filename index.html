@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>kmm kueche</title>
+<title>Interaktiver Raum</title>
 <style>
     html, body {
         margin: 0;
@@ -20,6 +20,7 @@
         background-repeat: no-repeat;
         position: relative; /* Referenz für absolute Hotspots */
         font-family: Arial, sans-serif;
+        color: #222;
     }
 
     /* Hotspots: absolute Positionierung + zentriert an (left,top) */
@@ -49,12 +50,12 @@
     }
 
     .modal {
-        background: white;
+        background: rgb(229, 229, 229);
         padding: 18px;
         border-radius: 10px;
-        max-width: 760px;
-        width: min(95%, 760px);
-        max-height: 85vh;
+        max-width: 900px;
+        width: min(95%, 900px);
+        max-height: 88vh;
         overflow: auto;
         box-shadow: 0 8px 30px rgba(0,0,0,0.3);
     }
@@ -69,7 +70,7 @@
         border: none;
     }
 
-    /* Steuerungs-Panel für Größenanpassung */
+     /* Steuerungs-Panel für Größenanpassung *//*
     #control-panel {
         position: fixed;
         top: 12px;
@@ -80,7 +81,7 @@
         box-shadow: 0 6px 20px rgba(0,0,0,0.15);
         z-index: 3000;
         font-size: 14px;
-    }
+    }*/
 
     #control-panel h4 { margin: 2px 0 8px 0; }
     .control-row { display:flex; align-items:center; gap:8px; margin-bottom:6px; }
@@ -181,7 +182,13 @@
     .audio-button:focus { outline: 3px solid rgba(43,124,255,0.25); outline-offset: 3px; }
     .audio-button:active { transform: translateY(0); }
 
-/* Warnung box */
+    /* Kleine Formatierung für Interview */
+    .interview p { margin:6px 0; }
+    .interview .speaker { font-weight:700; }
+    .konjunktiv { margin-top:12px; background:#fafafa; padding:10px; border-radius:6px; border:1px solid #eee; }
+
+
+    /* Warnung box (Modal 5) */
     .warning-box {
         background: #fff4e6;
         border-left: 6px solid #ff9a00;
@@ -196,7 +203,7 @@
     }
     .warning-list { margin:0; padding-left:18px; }
 
-    /* Center area image and drüber dots */
+    /* Center area with image and overlay dots */
     .image-area {
         display:flex;
         justify-content:center;
@@ -217,19 +224,19 @@
         box-shadow: 0 8px 20px rgba(0,0,0,0.12);
     }
 
-    /* Dots bei hover */
+    /* Dots mit Info bei hover */
     .info-dot {
         position:absolute;
         width:18px;
         height:18px;
         border-radius:50%;
-        background: rgba(43,124,255,0.18);
-        border: 2px solid rgba(43,124,255,0.6);
+        background: rgba(138, 138, 138, 0.736);
+        border: 2px solid rgba(54, 54, 54, 0.6);
         backdrop-filter: blur(1px);
         cursor: default;
         transition: transform 0.12s ease, background 0.12s ease;
     }
-    .info-dot:hover { transform: scale(1.25); background: rgba(43,124,255,0.28); }
+    .info-dot:hover { transform: scale(1.25); background: rgba(90, 255, 244, 0.28); }
 
     /* Tooltip für dots */
     .info-dot .dot-tip {
@@ -252,14 +259,14 @@
         display:block;
     }
 
-    /* small infobox */
+    /* kleine infobox (Modal 5) */
     .infobox {
         margin-top:12px;
         padding:10px;
         border-radius:8px;
         background:#f5f8ff;
         border:1px solid #dbe9ff;
-        color:#08306b;
+        color:#589fb8;
     }
 
     /* keep consistent tooltip style from earlier */
@@ -295,61 +302,34 @@
         .image-wrapper { width: 92%; }
         .info-dot { width:14px; height:14px; }
     }
-
-    /* Kleine Formatierung für Interview */
-    .interview p { margin:6px 0; }
-    .interview .speaker { font-weight:700; }
-    .konjunktiv { margin-top:12px; background:#fafafa; padding:10px; border-radius:6px; border:1px solid #eee; }
 </style>
 </head>
 <body>
 
+<!-- existing hotspots... -->
+
 <!-- Hotspot 1 (Messbecher) -->
-<img
-    id="hotspot1"
-    class="hotspot"
-    src="Medien/Messbecher.png"
-    data-open-src="Medien/Messbecher1.png"
-    alt="Messbecher"
-    style="left:40%; top:40%; width:80px;"
->
+<img id="hotspot1" class="hotspot" src="Medien/Messbecher.png" data-open-src="Medien/Messbecher1.png" alt="Messbecher" style="left:40%; top:40%; width:80px;">
 <!-- Modal 1 -->
 <div class="modal-overlay" id="modal1">
     <div class="modal">
         <button class="close-btn" onclick="closeModal('modal1')">Schließen</button>
         <h2>Statistik</h2>
 
-        <!-- Deskriptive Statistik Button mit Hover-Tooltip -->
         <div style="margin:12px 0;">
-            <button class="has-tooltip"
-                data-tooltip="Ist die Methode zur systematischen Beschreibung und Verdichtung von Daten mithilfe von Kennzahlen, Tabellen und Grafiken."
-                style="padding:8px 12px; border-radius:6px; border:1px solid #ccc; background:#f5f5f5; cursor:pointer;">
+            <button class="has-tooltip" data-tooltip="Ist die Methode zur systematischen Beschreibung und Verdichtung von Daten mithilfe von Kennzahlen, Tabellen und Grafiken." style="padding:8px 12px; border-radius:6px; border:1px solid #ccc; background:#f5f5f5; cursor:pointer;">
                 Deskriptive Statistik
             </button>
         </div>
 
-        <!-- Textblock -->
         <p>Hier sind ein paar Benennungen, über welche man beim Auswerten von Daten stolpern kann:</p>
 
-        <!-- Buttons für Median, Mittelwert, Modus mit Hover-Tooltips -->
         <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;">
-            <button class="has-tooltip"
-                data-tooltip="Ist ein statistisches Lagemaß, das den Wert in der Mitte einer nach Größe sortierten Datenreihe angibt."
-                style="padding:8px 12px; border-radius:6px; border:1px solid #ccc; background:#fff; cursor:pointer;">
-                Median
-            </button>
+            <button class="has-tooltip" data-tooltip="Ist ein statistisches Lagemaß, das den Wert in der Mitte einer nach Größe sortierten Datenreihe angibt." style="padding:8px 12px; border-radius:6px; border:1px solid #ccc; background:#fff; cursor:pointer;">Median</button>
 
-            <button class="has-tooltip"
-                data-tooltip="Auch arithmetisches Mittel genannt, ist ein statistischer Durchschnittswert."
-                style="padding:8px 12px; border-radius:6px; border:1px solid #ccc; background:#fff; cursor:pointer;">
-                Mittelwert
-            </button>
+            <button class="has-tooltip" data-tooltip="Auch arithmetisches Mittel genannt, ist ein statistischer Durchschnittswert." style="padding:8px 12px; border-radius:6px; border:1px solid #ccc; background:#fff; cursor:pointer;">Mittelwert</button>
 
-            <button class="has-tooltip"
-                data-tooltip="Auch Modalwert genannt, ist der am Häufigsten vorkommende Wert in einem Datensatz und ein Lagemaß."
-                style="padding:8px 12px; border-radius:6px; border:1px solid #ccc; background:#fff; cursor:pointer;">
-                Modus
-            </button>
+            <button class="has-tooltip" data-tooltip="Auch Modalwert genannt, ist der am Häufigsten vorkommende Wert in einem Datensatz und ein Lagemaß." style="padding:8px 12px; border-radius:6px; border:1px solid #ccc; background:#fff; cursor:pointer;">Modus</button>
         </div>
 
         <p class="help" style="margin-top:12px;">Fahre mit der Maus über die Buttons, um die Beschreibungen zu sehen.</p>
@@ -357,235 +337,202 @@
 </div>
 
 <!-- Hotspot 2 (Salzstreuer) -->
-<img
-    id="hotspot2"
-    class="hotspot"
-    src="Medien/Salzstreuer.png"
-    data-open-src="Medien/Salzstreuer1.png"
-    alt="Salzstreuer"
-    style="left:23%; top:15%; width:20px;"
->
+<img id="hotspot2" class="hotspot" src="Medien/Salzstreuer.png" data-open-src="Medien/Salzstreuer1.png" alt="Salzstreuer" style="left:23%; top:12%; width:20px;">
 <!-- Modal 2 -->
 <div class="modal-overlay" id="modal2">
-<div class="modal">
-<button class="close-btn" onclick="closeModal('modal2')">Schließen</button>
-<h2>Sprachwissenschaften 1</h2>
+  <div class="modal">
+    <button class="close-btn" onclick="closeModal('modal2')">Schließen</button>
+    <h2>Sprachwissenschaften 1</h2>
 
+    <p>Um die verschiedenen Arten von Nebensätzen zu lernen, sucht man sich am Besten Beispiele. Hier sind ein paar Beispiele von Nebensätzen.</p>
 
-<p>Um die verschiedenen Arten von Nebensätzen zu lernen, sucht man sich am Besten Beispiele. Hier sind ein paar Beispiele von Nebensätzen.</p>
-
-
-<div style="overflow:auto; margin-top:8px;">
-<table style="width:100%; border-collapse:collapse;">
-<thead>
-<tr style="background:#f2f2f2; text-align:left;">
-<th style="padding:8px; border:1px solid #ddd; width:35%;">Art</th>
-<th style="padding:8px; border:1px solid #ddd;">Beispiel</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="padding:8px; border:1px solid #ddd;">Subjektsatz</td>
-<td style="padding:8px; border:1px solid #ddd;">Dass du heute kommst,…</td>
-</tr>
-<tr>
-<td style="padding:8px; border:1px solid #ddd;">Konditionalsatz</td>
-<td style="padding:8px; border:1px solid #ddd;">…, wenn es heute regnet.</td>
-</tr>
-<tr>
-<td style="padding:8px; border:1px solid #ddd;">Kausalsatz</td>
-<td style="padding:8px; border:1px solid #ddd;">Weil sie krank ist,…</td>
-</tr>
-<tr>
-<td style="padding:8px; border:1px solid #ddd;">Konzessivsatz</td>
-<td style="padding:8px; border:1px solid #ddd;">…, obwohl sie früh dran waren.</td>
-</tr>
-<tr>
-<td style="padding:8px; border:1px solid #ddd;">Konsekutivsatz</td>
-<td style="padding:8px; border:1px solid #ddd;">Ohne dass er Erfolg hatte,…</td>
-</tr>
-<tr>
-<td style="padding:8px; border:1px solid #ddd;">Finalsatz</td>
-<td style="padding:8px; border:1px solid #ddd;">…, damit sie gesund wird.</td>
-</tr>
-<tr>
-<td style="padding:8px; border:1px solid #ddd;">Modalsatz</td>
-<td style="padding:8px; border:1px solid #ddd;">Indem sie sich leise anpirschen,…</td>
-</tr>
-<tr>
-<td style="padding:8px; border:1px solid #ddd;">Indirekter Fragesatz</td>
-<td style="padding:8px; border:1px solid #ddd;">…, ob das so gut ist.</td>
-</tr>
-</tbody>
-</table>
+    <div style="overflow:auto; margin-top:8px;">
+      <table style="width:100%; border-collapse:collapse;">
+        <thead>
+          <tr style="background:#f2f2f2; text-align:left;">
+            <th style="padding:8px; border:1px solid #ddd; width:35%;">Art</th>
+            <th style="padding:8px; border:1px solid #ddd;">Beispiel</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td style="padding:8px; border:1px solid #ddd;">Subjektsatz</td><td style="padding:8px; border:1px solid #ddd;">Dass du heute kommst,…</td></tr>
+          <tr><td style="padding:8px; border:1px solid #ddd;">Konditionalsatz</td><td style="padding:8px; border:1px solid #ddd;">…, wenn es heute regnet.</td></tr>
+          <tr><td style="padding:8px; border:1px solid #ddd;">Kausalsatz</td><td style="padding:8px; border:1px solid #ddd;">Weil sie krank ist,…</td></tr>
+          <tr><td style="padding:8px; border:1px solid #ddd;">Konzessivsatz</td><td style="padding:8px; border:1px solid #ddd;">…, obwohl sie früh dran waren.</td></tr>
+          <tr><td style="padding:8px; border:1px solid #ddd;">Konsekutivsatz</td><td style="padding:8px; border:1px solid #ddd;">Ohne dass er Erfolg hatte,…</td></tr>
+          <tr><td style="padding:8px; border:1px solid #ddd;">Finalsatz</td><td style="padding:8px; border:1px solid #ddd;">…, damit sie gesund wird.</td></tr>
+          <tr><td style="padding:8px; border:1px solid #ddd;">Modalsatz</td><td style="padding:8px; border:1px solid #ddd;">Indem sie sich leise anpirschen,…</td></tr>
+          <tr><td style="padding:8px; border:1px solid #ddd;">Indirekter Fragesatz</td><td style="padding:8px; border:1px solid #ddd;">…, ob das so gut ist.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
 </div>
-</div>
-</div>
+
 <!-- Hotspot 3 (Teller) -->
-<img
-    id="hotspot3"
-    class="hotspot"
-    src="Medien/Teller.png"
-    data-open-src="Medien/Teller1.png"
-    alt="Teller"
-    style="left:80%; top:60%; width: 80px;"
->
+<img id="hotspot3" class="hotspot" src="Medien/Teller.png" data-open-src="Medien/Teller1.png" alt="Teller" style="left:80%; top:60%; width: 80px;">
 <!-- Modal 3 -->
 <div class="modal-overlay" id="modal3">
-<div class="modal">
-<button class="close-btn" onclick="closeModal('modal3')">Schließen</button>
-<h2>Grundlagen Gestaltung</h2>
+  <div class="modal">
+    <button class="close-btn" onclick="closeModal('modal3')">Schließen</button>
+    <h2>Grundlagen Gestaltung</h2>
 
-<p>Zum Gestalten von Grafiken, Flyern, Posts, Magazinen usw. kann man verschiedene Programme verwenden.</p>
-<p>Die Adobe Programme werden oft von Firmen verwendet, um den Einstieg zu erleichtern, gibt es mehrere Tutorialvideos von Kreativen auf YouTube.</p>
+    <p>Zum Gestalten von Grafiken, Flyern, Posts, Magazinen usw. kann man verschiedene Programme verwenden.</p>
+    <p>Die Adobe Programme werden oft von Firmen verwendet, um den Einstieg zu erleichtern, gibt es mehrere Tutorialvideos von Kreativen auf YouTube.</p>
 
-<!-- Adobe Links als Buttons mit Icons -->
-<div style="display:flex; flex-direction:column; gap:8px; margin-top:10px;">
-    <a class="link-button" href="https://youtu.be/3NBKRywEbNs?si=tRVhnZkZDoQV_XGF" target="_blank">
-        <svg width="36" height="36" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img">
-            <rect width="36" height="36" rx="6" fill="#ff9a00"></rect>
-            <text x="18" y="23" font-family="Arial" font-size="14" fill="#fff" font-weight="700" text-anchor="middle">Ai</text>
-        </svg>
-        <div>
-            <div style="font-weight:600;">Illustrator</div>
-            <div style="font-size:13px; color:#555;">Tutorial ansehen (YouTube)</div>
-        </div>
-    </a>
+    <!-- Adobe Links als Buttons mit Icons -->
+    <div style="display:flex; flex-direction:column; gap:8px; margin-top:10px;">
+        <a class="link-button" href="https://youtu.be/3NBKRywEbNs?si=tRVhnZkZDoQV_XGF" target="_blank">
+            <svg width="36" height="36" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img">
+                <rect width="36" height="36" rx="6" fill="#ff9a00"></rect>
+                <text x="18" y="23" font-family="Arial" font-size="14" fill="#fff" font-weight="700" text-anchor="middle">Ai</text>
+            </svg>
+            <div>
+                <div style="font-weight:600;">Illustrator</div>
+                <div style="font-size:13px; color:#555;">Tutorial ansehen (YouTube)</div>
+            </div>
+        </a>
 
-    <a class="link-button" href="https://youtu.be/wF_fu1wcT0Y?si=viaFIvuiWSaijC8Z" target="_blank">
-        <svg width="36" height="36" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img">
-            <rect width="36" height="36" rx="6" fill="#ff3366"></rect>
-            <text x="18" y="23" font-family="Arial" font-size="14" fill="#fff" font-weight="700" text-anchor="middle">Id</text>
-        </svg>
-        <div>
-            <div style="font-weight:600;">InDesign</div>
-            <div style="font-size:13px; color:#555;">Tutorial ansehen (YouTube)</div>
-        </div>
-    </a>
+        <a class="link-button" href="https://youtu.be/wF_fu1wcT0Y?si=viaFIvuiWSaijC8Z" target="_blank">
+            <svg width="36" height="36" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img">
+                <rect width="36" height="36" rx="6" fill="#ff3366"></rect>
+                <text x="18" y="23" font-family="Arial" font-size="14" fill="#fff" font-weight="700" text-anchor="middle">Id</text>
+            </svg>
+            <div>
+                <div style="font-weight:600;">InDesign</div>
+                <div style="font-size:13px; color:#555;">Tutorial ansehen (YouTube)</div>
+            </div>
+        </a>
 
-    <a class="link-button" href="https://youtu.be/xTzvQkOll2U?si=orQbilAffnwwcCaR" target="_blank">
-        <svg width="36" height="36" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img">
-            <rect width="36" height="36" rx="6" fill="#31a8ff"></rect>
-            <text x="18" y="23" font-family="Arial" font-size="14" fill="#fff" font-weight="700" text-anchor="middle">Ps</text>
-        </svg>
-        <div>
-            <div style="font-weight:600;">Photoshop</div>
-            <div style="font-size:13px; color:#555;">Tutorial ansehen (YouTube)</div>
-        </div>
-    </a>
-</div>
+        <a class="link-button" href="https://youtu.be/xTzvQkOll2U?si=orQbilAffnwwcCaR" target="_blank">
+            <svg width="36" height="36" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img">
+                <rect width="36" height="36" rx="6" fill="#31a8ff"></rect>
+                <text x="18" y="23" font-family="Arial" font-size="14" fill="#fff" font-weight="700" text-anchor="middle">Ps</text>
+            </svg>
+            <div>
+                <div style="font-weight:600;">Photoshop</div>
+                <div style="font-size:13px; color:#555;">Tutorial ansehen (YouTube)</div>
+            </div>
+        </a>
+    </div>
 
-<p style="margin-top:12px;">Es gibt auch gute kostenfreie Alternativen zu den Programmen.</p>
+    <p style="margin-top:12px;">Es gibt auch gute kostenfreie Alternativen zu den Programmen.</p>
 
-<!-- Kostenfreie Alternativen als Buttons -->
-<div style="display:flex; flex-direction:column; gap:8px; margin-top:8px;">
-    <a class="link-button" href="https://www.canva.com/de_de/herunterladen/windows/" target="_blank">
-        <svg width="36" height="36" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img">
-            <circle cx="18" cy="18" r="18" fill="#00c4a7"></circle>
-            <text x="18" y="23" font-family="Arial" font-size="14" fill="#fff" font-weight="700" text-anchor="middle">C</text>
-        </svg>
-        <div>
-            <div style="font-weight:600;">Canva</div>
-            <div style="font-size:13px; color:#555;">Zur Website</div>
-        </div>
-    </a>
+    <!-- Kostenfreie Alternativen als Buttons -->
+    <div style="display:flex; flex-direction:column; gap:8px; margin-top:8px;">
+        <a class="link-button" href="https://www.canva.com/de_de/herunterladen/windows/" target="_blank">
+            <svg width="36" height="36" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img">
+                <circle cx="18" cy="18" r="18" fill="#00c4a7"></circle>
+                <text x="18" y="23" font-family="Arial" font-size="14" fill="#fff" font-weight="700" text-anchor="middle">C</text>
+            </svg>
+            <div>
+                <div style="font-weight:600;">Canva</div>
+                <div style="font-size:13px; color:#555;">Zur Website</div>
+            </div>
+        </a>
 
-    <a class="link-button" href="https://www.affinity.studio/de_de/download" target="_blank">
-        <svg width="36" height="36" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img">
-            <rect width="36" height="36" rx="6" fill="#7b61ff"></rect>
-            <text x="18" y="23" font-family="Arial" font-size="14" fill="#fff" font-weight="700" text-anchor="middle">A</text>
-        </svg>
-        <div>
-            <div style="font-weight:600;">Affinity</div>
-            <div style="font-size:13px; color:#555;">Zur Website</div>
-        </div>
-    </a>
-</div>
-
-</div>
+        <a class="link-button" href="https://www.affinity.studio/de_de/download" target="_blank">
+            <svg width="36" height="36" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img">
+                <rect width="36" height="36" rx="6" fill="#7b61ff"></rect>
+                <text x="18" y="23" font-family="Arial" font-size="14" fill="#fff" font-weight="700" text-anchor="middle">A</text>
+            </svg>
+            <div>
+                <div style="font-weight:600;">Affinity</div>
+                <div style="font-size:13px; color:#555;">Zur Website</div>
+            </div>
+        </a>
+    </div>
+  </div>
 </div>
 
 <!-- Hotspot 4 (Schneidebrett) -->
-<img
-    id="hotspot4"
-    class="hotspot"
-    src="Medien/Schneidebrett.png"
-    data-open-src="Medien/Schneidebrett1.png"
-    alt="Schneidebrett"
-    style="left:90%; top:60%; width:150px;"
->
+<img id="hotspot4" class="hotspot" src="Medien/Schneidebrett.png" data-open-src="Medien/Schneidebrett1.png" alt="Schneidebrett" style="left:90%; top:60%; width:150px;">
 <!-- Modal 4 -->
 <div class="modal-overlay" id="modal4">
-    <div class="modal">
-        <button class="close-btn" onclick="closeModal('modal4')">Schließen</button>
+  <div class="modal">
+    <button class="close-btn" onclick="closeModal('modal4')">Schließen</button>
 
-        <h2>Professionelles Deutsch</h2>
+    <h2>Professionelles Deutsch</h2>
 
-        <div class="interview" aria-label="Interview">
-            <p style="color: #555;font-size: 20px;">Interview</p>
+    <div class="interview" aria-label="Interview">
+        <p class="speaker">Interview</p>
 
-            <p><span class="speaker">Interviewer:</span> Warum haben Sie sich für das Studium Kommunikation und Medienmanagement entschieden?</p>
-            <p><span class="speaker">Studentin:</span> Ich habe mich schon immer für Medien, kreative Prozesse und strategische Kommunikation interessiert. Das Studium vereint all diese Bereiche perfekt.</p>
+        <p><span class="speaker">Interviewer:</span> Warum haben Sie sich für das Studium Kommunikation und Medienmanagement entschieden?</p>
+        <p><span class="speaker">Studentin:</span> Ich habe mich schon immer für Medien, kreative Prozesse und strategische Kommunikation interessiert. Das Studium vereint all diese Bereiche perfekt.</p>
 
-            <p><span class="speaker">Interviewer:</span> Was gefällt Ihnen am meisten an Ihrem Studienalltag?</p>
-            <p><span class="speaker">Studentin:</span> Mir gefällt besonders die Kombination aus Praxisprojekten und theoretischen Grundlagen. Außerdem arbeite ich gerne im Team, was im Studium sehr häufig vorkommt.</p>
+        <p><span class="speaker">Interviewer:</span> Was gefällt Ihnen am meisten an Ihrem Studienalltag?</p>
+        <p><span class="speaker">Studentin:</span> Mir gefällt besonders die Kombination aus Praxisprojekten und theoretischen Grundlagen. Außerdem arbeite ich gerne im Team, was im Studium sehr häufig vorkommt.</p>
 
-            <p><span class="speaker">Interviewer:</span> Gibt es besondere Herausforderungen?</p>
-            <p><span class="speaker">Studentin:</span> Ja, vor allem das Zeitmanagement. Es gibt viele Projekte, Präsentationen und Gruppenarbeiten gleichzeitig. Man muss wirklich gut organisiert sein.</p>
+        <p><span class="speaker">Interviewer:</span> Gibt es besondere Herausforderungen?</p>
+        <p><span class="speaker">Studentin:</span> Ja, vor allem das Zeitmanagement. Es gibt viele Projekte, Präsentationen und Gruppenarbeiten gleichzeitig. Man muss wirklich gut organisiert sein.</p>
 
-            <p><span class="speaker">Interviewer:</span> Welche beruflichen Ziele haben Sie nach dem Abschluss?</p>
-            <p><span class="speaker">Studentin:</span> Ich möchte gerne in eine Kommunikationsagentur gehen oder später im Bereich Social Media Management arbeiten. Kreativität und strategisches Denken zu verbinden, ist genau mein Ding.</p>
-        </div>
-
-        <div class="konjunktiv" aria-label="Konjunktiv II Text">
-            <p><strong>Text im Konjunktiv 2</strong></p>
-            <p>Die Studentin erzählte, sie habe sich für das Studium entschieden, weil sie sich schon immer für Medien, kreative Prozesse und strategische Kommunikation interessiert hätte. Das Studium vereine all diese Bereiche auf ideale Weise.</p>
-
-            <p>Sie meinte, am meisten würde ihr die Mischung aus Praxisprojekten und theoretischen Grundlagen gefallen. Besonders gerne würde sie im Team arbeiten, was im Studienalltag sehr häufig vorkäme.</p>
-
-            <p>Auf die Herausforderungen angesprochen, sagte sie, vor allem das Zeitmanagement wäre anspruchsvoll. Es gebe viele Projekte, Präsentationen und Gruppenarbeiten gleichzeitig, weshalb man sehr gut organisiert sein müsse.</p>
-
-            <p>Zu ihren Zukunftsplänen erklärte sie, sie würde nach dem Abschluss gerne in einer Kommunikationsagentur arbeiten oder später im Social Media Management tätig sein. Es mache ihr Freude, Kreativität mit strategischem Denken zu verbinden.</p>
-        </div>
-
-        <!-- Audio: Vorlesen lassen -->
-        <div style="margin-top:12px;">
-            <!-- Audiodatei: bitte in Medien/ ablegen oder Pfad anpassen -->
-            <audio id="modal4-audio" src="Medien/vorlesen_konjunktiv2.mp3" preload="none"></audio>
-
-            <button id="modal4-audio-btn" class="audio-button" aria-pressed="false" aria-label="Vorlesen lassen">
-                ▶ Vorlesen lassen
-            </button>
-        </div>
-
+        <p><span class="speaker">Interviewer:</span> Welche beruflichen Ziele haben Sie nach dem Abschluss?</p>
+        <p><span class="speaker">Studentin:</span> Ich möchte gerne in eine Kommunikationsagentur gehen oder später im Bereich Social Media Management arbeiten. Kreativität und strategisches Denken zu verbinden, ist genau mein Ding.</p>
     </div>
+
+    <div class="konjunktiv" aria-label="Konjunktiv II Text">
+        <p><strong>Text im Konjunktiv 2</strong></p>
+        <p>Die Studentin erzählte, sie habe sich für das Studium entschieden, weil sie sich schon immer für Medien, kreative Prozesse und strategische Kommunikation interessiert hätte. Das Studium vereine all diese Bereiche auf ideale Weise.</p>
+
+        <p>Sie meinte, am meisten würde ihr die Mischung aus Praxisprojekten und theoretischen Grundlagen gefallen. Besonders gerne würde sie im Team arbeiten, was im Studienalltag sehr häufig vorkäme.</p>
+
+        <p>Auf die Herausforderungen angesprochen, sagte sie, vor allem das Zeitmanagement wäre anspruchsvoll. Es gebe viele Projekte, Präsentationen und Gruppenarbeiten gleichzeitig, weshalb man sehr gut organisiert sein müsse.</p>
+
+        <p>Zu ihren Zukunftsplänen erklärte sie, sie würde nach dem Abschluss gerne in einer Kommunikationsagentur arbeiten oder später im Social Media Management tätig sein. Es mache ihr Freude, Kreativität mit strategischem Denken zu verbinden.</p>
+    </div>
+
+    <!-- Audio: Vorlesen lassen -->
+    <div style="margin-top:12px;">
+      <audio id="modal4-audio" src="Medien/vorlesen_konjunktiv2.mp3" preload="none"></audio>
+      <button id="modal4-audio-btn" class="audio-button" aria-pressed="false" aria-label="Vorlesen lassen">▶ Vorlesen lassen</button>
+    </div>
+  </div>
 </div>
 
+<!-- Hotspot 5 (Anleitung) -->
+<img id="hotspot5" class="hotspot" src="Medien/Anleitung.png" data-open-src="Medien/Anleitung1.png" alt="Anleitung" style="left:62%; top:10%; width:40px;">
+<!-- Modal 5 -->
+<div class="modal-overlay" id="modal5">
+  <div class="modal">
+    <button class="close-btn" onclick="closeModal('modal5')">Schließen</button>
+    <h1>Technische Dokumentation 1</h1>
+    <h2>Anleitung</h2>
 
-<!-- Steuerungs-Panel: Größen anpassen
-<div id="control-panel">
-    <h4>Hotspot-Größen</h4>
-    <div class="control-row">
-        <label for="size1">Messbecher</label>
-        <input id="size1" type="range" min="40" max="400" value="120" oninput="setSize('hotspot1', this.value)">
-        <div class="value" id="val1">120px</div>
+    <!-- Warning box with two warnings -->
+    <div class="warning-box" role="alert" aria-live="polite">
+      <div class="warn">Warnhinweise zum Toaster</div>
+      <ul class="warning-list">
+        <li><strong></strong> Ziehe niemals das Netzkabel am Gerät, wenn es funktionsgestört ist. Trenne das Gerät vorher vom Stromnetz.</li>
+        <li><strong></strong> Benutze den Toaster nicht in der Nähe von Wasser oder feuchten Flächen — Gefahr eines elektrischen Schlages.</li>
+      </ul>
     </div>
-    <div class="control-row">
-        <label for="size2">Salzstreuer</label>
-        <input id="size2" type="range" min="40" max="400" value="140" oninput="setSize('hotspot2', this.value)">
-        <div class="value" id="val2">140px</div>
+
+    <!-- Central image with three semi-transparent points -->
+    <div class="image-area" aria-hidden="false">
+      <div class="image-wrapper" role="img" aria-label="Toaster mit Informationspunkten">
+        <img src="Medien/Toaster.png" alt="Toaster Abbildung">
+        <!-- Dot 1 (links unten) -->
+        <div class="info-dot" style="left:18%; top:87%;" tabindex="0" aria-describedby="dot1">
+          <div class="dot-tip" id="dot1">Stecker: Vor dem Reinigen immer vom Strom trennen.</div>
+        </div>
+        <!-- Dot 2 (Mitte) -->
+        <div class="info-dot" style="left:50%; top:50%;" tabindex="0" aria-describedby="dot2">
+          <div class="dot-tip" id="dot2">Schlitze: Krümel regelmäßig entfernen, um Brandgefahr zu vermeiden.</div>
+        </div>
+        <!-- Dot 3 (rechts oben) -->
+        <div class="info-dot" style="left:82%; top:30%;" tabindex="0" aria-describedby="dot3">
+          <div class="dot-tip" id="dot3">Gehäuse: Nicht mit scharfen Reinigungsmitteln behandeln.</div>
+        </div>
+      </div>
     </div>
-    <div class="control-row">
-        <label for="size3">Teller</label>
-        <input id="size3" type="range" min="40" max="400" value="110" oninput="setSize('hotspot3', this.value)">
-        <div class="value" id="val3">110px</div>
+
+    <!-- Small infobox about Funktionsdesign -->
+    <div class="infobox" role="note" aria-live="polite">
+      <strong>Was ist Funktionsdesign?</strong>
+      <p style="margin:6px 0 0 0;">Funktionsdesign ist eine Standardisierungs- und Strukturierungsmethode für die Technische Dokumentation und Technische Kommunikation, welche auch bei Anleitungen eine besondere Rolle spielt.</p>
     </div>
-    <div class="control-row">
-        <label for="size4">Schneidebrett</label>
-        <input id="size4" type="range" min="40" max="400" value="150" oninput="setSize('hotspot4', this.value)">
-        <div class="value" id="val4">150px</div>
-    </div>
-    <div class="help">Ziehe die Regler, um die Breite (px) der Hotspot-Bilder anzupassen.</div>-->
+
+  </div>
 </div>
 
 <script>
@@ -594,6 +541,11 @@
         document.getElementById(id).style.display = 'flex';
     }
     function closeModal(id) {
+        // falls Modal4 Audio läuft, stoppen (sicherheitsmaßnahme)
+        if(id === 'modal4') {
+            const a = document.getElementById('modal4-audio');
+            if(a && !a.paused) { a.pause(); a.currentTime = 0; updateAudioBtn(false); }
+        }
         document.getElementById(id).style.display = 'none';
     }
 
@@ -603,7 +555,7 @@
         if(!el) return;
         el.addEventListener('click', function(e){
             const openSrc = el.getAttribute('data-open-src');
-            if(openSrc) el.src = openSrc; // Bildquelle ändern
+            if(openSrc) el.src = openSrc; // Bildquelle ändern (aktiviert)
             openModal(modalId); // passendes Modal öffnen
             e.stopPropagation();
         });
@@ -613,8 +565,9 @@
     setupHotspot('hotspot2', 'modal2');
     setupHotspot('hotspot3', 'modal3');
     setupHotspot('hotspot4', 'modal4');
+    setupHotspot('hotspot5', 'modal5'); // neuer Hotspot
 
-        // Audio-Player für Modal 4
+    // Audio-Player für Modal 4 (wie vorher)
     (function(){
         const audio = document.getElementById('modal4-audio');
         const btn = document.getElementById('modal4-audio-btn');
@@ -624,54 +577,32 @@
             btn.setAttribute('aria-pressed', playing ? 'true' : 'false');
             btn.textContent = playing ? '■ Stopp' : '▶ Vorlesen lassen';
         }
-
-        // Expose to closeModal
         window.updateAudioBtn = updateAudioBtn;
 
         if(btn && audio) {
             btn.addEventListener('click', function(){
                 if(audio.paused) {
-                    // start playing
-                    audio.play().then(() => {
-                        updateAudioBtn(true);
-                    }).catch(err => {
-                        console.warn('Audio konnte nicht abgespielt werden:', err);
-                    });
+                    audio.play().then(() => { updateAudioBtn(true); }).catch(err => { console.warn(err); });
                 } else {
                     audio.pause();
                     audio.currentTime = 0;
                     updateAudioBtn(false);
                 }
             });
-
-            // Wenn Audio endet, Button zurücksetzen
-            audio.addEventListener('ended', function(){
-                updateAudioBtn(false);
-            });
+            audio.addEventListener('ended', function(){ updateAudioBtn(false); });
         }
     })();
 
-    // Größensteuerung: ändert die CSS width des Bildes
-    function setSize(hotspotId, px) {
-        const el = document.getElementById(hotspotId);
-        if(!el) return;
-        el.style.width = px + 'px';
-        // Update Wert-Anzeige
-        const val = document.getElementById('val' + hotspotId.replace('hotspot',''));
-        if(val) val.textContent = px + 'px';
-    }
-
-    // Initiale Werte in Anzeige setzen (falls Styles inline geändert wurden)
-    document.addEventListener('DOMContentLoaded', function(){
-        ['hotspot1','hotspot2','hotspot3','hotspot4'].forEach(function(id){
-            const el = document.getElementById(id);
-            if(!el) return;
-            const px = parseInt(getComputedStyle(el).width,10);
-            const idx = id.replace('hotspot','');
-            const range = document.getElementById('size' + idx);
-            const val = document.getElementById('val' + idx);
-            if(range) range.value = px;
-            if(val) val.textContent = px + 'px';
+    // Make info-dots keyboard accessible: show tip on focus (they already show via :focus in CSS if needed)
+    document.querySelectorAll('.info-dot').forEach(function(dot){
+        dot.addEventListener('keydown', function(e){
+            // allow Enter or Space to toggle showing tooltip (focus already shows via CSS)
+            if(e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                // simple visual feedback: pulse
+                dot.style.transform = (dot.style.transform.includes('scale(1.25)')) ? '' : 'scale(1.25)';
+                setTimeout(()=>{ dot.style.transform=''; }, 350);
+            }
         });
     });
 
@@ -682,6 +613,14 @@
         });
     });
 
+    // optional: stop audio when switching away from modal4
+    document.addEventListener('keydown', function(e){
+        if(e.key === 'Escape') {
+            document.querySelectorAll('.modal-overlay').forEach(m => m.style.display = 'none');
+            const a = document.getElementById('modal4-audio');
+            if(a && !a.paused) { a.pause(); a.currentTime = 0; updateAudioBtn(false); }
+        }
+    });
 </script>
 
 </body>
