@@ -1,1089 +1,719 @@
 <!DOCTYPE html>
 <html lang="de">
+
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Interaktiver Raum</title>
-<style>
-    html, body {
-        margin: 0;
-        padding: 0;
-        overflow: hidden; /* kein Scrollen */
-        width: 100vw;
-        height: 100vh;
-    }
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Interaktiver Raum</title>
+    <link rel="stylesheet" href="style.css">
 
-    body {
-        background-image: url('Medien/Skizze_Raum.jpeg');
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
-        position: relative; /* Referenz für absolute Hotspots */
-        font-family: Arial, sans-serif;
-        color: #222;
-        transition: background-image 900ms ease-in-out, background-color 900ms ease-in-out;
-}
-/*Hintergrund ändern*/
-body.all-hotspots-done {
-background-image: url('Medien/Raum_ende.jpg');
-background-color: #111;
-}
-
-    /* Hotspots: absolute Positionierung + zentriert an (left,top) */
-    .hotspot {
-        position: absolute;
-        cursor: pointer;
-        transition: transform 0.15s;
-        transform: translate(-50%, -50%); /* damit left/top die Mitte des Bildes definieren */
-        user-select: none;
-        -webkit-user-drag: none;
-    }
-
-    .hotspot:hover {
-        transform: translate(-50%, -50%) scale(1.05);
-    }
-
-    /* Modal */
-    .modal-overlay {
-        display: none;
-        position: fixed;
-        inset: 0; /* top:0;right:0;bottom:0;left:0 */
-        background: rgba(0,0,0,0.5);
-        justify-content: center;
-        align-items: center;
-        padding: 20px;
-        z-index: 2000;
-    }
-
-    .modal {
-        background: rgb(229, 229, 229);
-        padding: 18px;
-        border-radius: 10px;
-        max-width: 900px;
-        width: min(95%, 900px);
-        max-height: 88vh;
-        overflow: auto;
-        box-shadow: 0 8px 30px rgba(0,0,0,0.3);
-    }
-
-    .modal .close-btn {
-        float: right;
-        cursor: pointer;
-        background: #e23b3b;
-        color: white;
-        padding: 6px 10px;
-        border-radius: 6px;
-        border: none;
-    }
-
-    #control-panel h4 { margin: 2px 0 8px 0; }
-    .control-row { display:flex; align-items:center; gap:8px; margin-bottom:6px; }
-    .control-row label { min-width:70px; }
-    .control-row input[type=range] { width:120px; }
-    .control-row .value { min-width:40px; text-align:right; }
-
-    .help { font-size:12px; color:#333; opacity:0.8; }
-
-.has-tooltip {
-  position: relative;
-  outline: none;
-}
-
-.has-tooltip::after {
-  content: attr(data-tooltip);
-  position: absolute;
-  left: 50%;
-  bottom: calc(100% + 8px);
-  transform: translateX(-50%);
-  background: rgba(0,0,0,0.85);
-  color: #fff;
-  padding: 6px 8px;
-  border-radius: 5px;
-  white-space: nowrap;
-  font-size: 13px;
-  line-height: 1.2;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.12s ease, transform 0.12s ease;
-  transform-origin: center bottom;
-  z-index: 9999;
-}
-
-.has-tooltip:hover::after,
-.has-tooltip:focus::after {
-  opacity: 1;
-  transform: translateX(-50%) translateY(-4px);
-}
-
- /* Link-Buttons (Modal 3) */
-    .link-button {
-        display:flex;
-        align-items:center;
-        gap:10px;
-        padding:10px 12px;
-        border-radius:8px;
-        border:1px solid #ddd;
-        background:#fff;
-        box-shadow:0 4px 10px rgba(0,0,0,0.04);
-        text-decoration:none;
-        color:inherit;
-        transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
-    }
-
-    .link-button:hover {
-        transform: translateY(-4px);
-        background: linear-gradient(180deg, #ffffff, #fbfbfb);
-        box-shadow: 0 8px 24px rgba(0,0,0,0.08);
-    }
-
-    .link-button:focus {
-        outline: 3px solid rgba(63,132,255,0.25);
-        outline-offset: 3px;
-    }
-
-    .link-button:focus:not(:focus-visible) {
-        outline: none;
-    }
-
-    .link-button svg { flex: 0 0 36px; height:36px; width:36px; }
-
-  /* Audio-Button (Modal 4) */
-    .audio-button {
-        display:inline-flex;
-        align-items:center;
-        gap:10px;
-        padding:10px 14px;
-        border-radius:8px;
-        border:1px solid #2b7cff;
-        background:#2b7cff;
-        color:white;
-        cursor:pointer;
-        font-weight:600;
-        box-shadow: 0 6px 18px rgba(43,124,255,0.12);
-        transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
-    }
-    .audio-button:hover { transform: translateY(-3px); background:#1f63d6; box-shadow: 0 10px 24px rgba(31,99,214,0.14); }
-    .audio-button:focus { outline: 3px solid rgba(43,124,255,0.25); outline-offset: 3px; }
-    .audio-button:active { transform: translateY(0); }
-
-    .interview p { margin:6px 0; }
-    .interview .speaker { font-weight:700; }
-    .konjunktiv { margin-top:12px; background:#fafafa; padding:10px; border-radius:6px; border:1px solid #eee; }
-
-    .warning-box {
-        background: #fff4e6;
-        border-left: 6px solid #ff9a00;
-        padding: 12px;
-        border-radius: 6px;
-        margin-bottom: 12px;
-    }
-    .warning-box .warn {
-        font-weight:700;
-        color:#8a3b00;
-        margin-bottom:6px;
-    }
-    .warning-list { margin:0; padding-left:18px; }
-
-    .image-area {
-        display:flex;
-        justify-content:center;
-        margin:18px 0;
-    }
-    .image-wrapper {
-        position:relative;
-        width: 420px;
-        max-width: 90%;
-        border-radius:8px;
-        overflow:visible;
-    }
-    .image-wrapper img {
-        display:block;
-        width:100%;
-        height:auto;
-        border-radius:6px;
-        box-shadow: 0 8px 20px rgba(0,0,0,0.12);
-    }
-
-    .info-dot {
-        position:absolute;
-        width:18px;
-        height:18px;
-        border-radius:50%;
-        background: rgba(138, 138, 138, 0.736);
-        border: 2px solid rgba(54, 54, 54, 0.6);
-        backdrop-filter: blur(1px);
-        cursor: default;
-        transition: transform 0.12s ease, background 0.12s ease;
-    }
-    .info-dot:hover { transform: scale(1.25); background: rgba(90, 255, 244, 0.28); }
-
-    .info-dot .dot-tip {
-        display:none;
-        position:absolute;
-        left:50%;
-        transform:translateX(-50%);
-        bottom:calc(100% + 8px);
-        background: rgba(0,0,0,0.85);
-        color:#fff;
-        padding:8px 10px;
-        border-radius:6px;
-        font-size:13px;
-        white-space:nowrap;
-        z-index:50;
-        pointer-events:none;
-    }
-    .info-dot:hover .dot-tip,
-    .info-dot:focus .dot-tip {
-        display:block;
-    }
-
-    .infobox {
-        margin-top:12px;
-        padding:10px;
-        border-radius:8px;
-        background:#f5f8ff;
-        border:1px solid #dbe9ff;
-        color:#589fb8;
-    }
-
-    .has-tooltip {
-      position: relative;
-      outline: none;
-    }
-
-    .has-tooltip::after {
-      content: attr(data-tooltip);
-      position: absolute;
-      left: 50%;
-      bottom: calc(100% + 8px);
-      transform: translateX(-50%);
-      background: rgba(0,0,0,0.85);
-      color: #fff;
-      padding: 6px 8px;
-      border-radius: 5px;
-      white-space: nowrap;
-      font-size: 13px;
-      line-height: 1.2;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.12s ease, transform 0.12s ease;
-      z-index: 9999;
-    }
-    .has-tooltip:hover::after,
-    .has-tooltip:focus::after {
-      opacity: 1;
-      transform: translateX(-50%) translateY(-4px);
-    }
-
-    /* Video-spezifische Styles */
-    .video-container {
-        display:flex;
-        flex-direction:column;
-        gap:10px;
-        margin-top:10px;
-    }
-    .video-controls { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
-    .video-controls button { padding:8px 10px; border-radius:6px; border:1px solid #ccc; background:#fff; cursor:pointer; }
-    .video-controls button:focus { outline:3px solid rgba(63,132,255,0.18); }
-
-    @media (max-width:640px) {
-        .image-wrapper { width: 92%; }
-        .info-dot { width:14px; height:14px; }
-    }
-</style>
 </head>
+
 <body>
 
 
 <!-- Hotspot 1 (Messbecher) -->
-<img id="hotspot1" 
-class="hotspot" 
-src="Medien/Messbecher.png" 
-data-open-src="Medien/Messbecher1.png" 
-alt="Messbecher" 
-style="left:40%; top:43%; width:60px;">
+<span class="hotspot-wrapper" data-name="Statistik" style="left:40%; top:43%;">
+    <img id="hotspot1" class="hotspot"
+         src="Medien/Messbecher.png" 
+         data-open-src="Medien/Messbecher1.png" 
+         alt="Messbecher" 
+         style="width:60px;">
+</span>
+    <!-- Modal 1 -->
+    <div class="modal-overlay" id="modal1">
+        <div class="modal">
+            <button class="close-btn" onclick="closeModal('modal1')">Schließen</button>
+            <h2>Statistik</h2>
 
-<!-- Modal 1 -->
-<div class="modal-overlay" id="modal1">
-    <div class="modal">
-        <button class="close-btn" onclick="closeModal('modal1')">Schließen</button>
-        <h2>Statistik</h2>
-
-        <div style="margin:12px 0;">
-            <button class="has-tooltip" data-tooltip="Ist die Methode zur systematischen Beschreibung und Verdichtung von Daten mithilfe von Kennzahlen, Tabellen und Grafiken." style="padding:8px 12px; border-radius:6px; border:1px solid #ccc; background:#f5f5f5; cursor:pointer;">
+            <div style="margin:12px 0;">
+                <button class="modal-tooltip" data-tooltip="Ist die Methode zur systematischen Beschreibung und Verdichtung von Daten mithilfe von Kennzahlen, Tabellen und Grafiken." style="padding:8px 12px; border-radius:6px; border:1px solid #ccc; background:#f5f5f5; cursor:pointer;">
                 Deskriptive Statistik
             </button>
+            </div>
+
+            <p>Hier sind ein paar Benennungen, über welche man beim Auswerten von Daten stolpern kann:</p>
+
+            <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;">
+                <button class="modal-tooltip" data-tooltip="Ist ein statistisches Lagemaß, das den Wert in der Mitte einer nach Größe sortierten Datenreihe angibt." style="padding:8px 12px; border-radius:6px; border:1px solid #ccc; background:#fff; cursor:pointer;">Median</button>
+
+                <button class="modal-tooltip" data-tooltip="Auch arithmetisches Mittel genannt, ist ein statistischer Durchschnittswert." style="padding:8px 12px; border-radius:6px; border:1px solid #ccc; background:#fff; cursor:pointer;">Mittelwert</button>
+
+                <button class="modal-tooltip" data-tooltip="Auch Modalwert genannt, ist der am Häufigsten vorkommende Wert in einem Datensatz und ein Lagemaß." style="padding:8px 12px; border-radius:6px; border:1px solid #ccc; background:#fff; cursor:pointer;">Modus</button>
+            </div>
+
+            <p class="help" style="margin-top:12px;">Fahre mit der Maus über die Buttons, um die Beschreibungen zu sehen.</p>
         </div>
-
-        <p>Hier sind ein paar Benennungen, über welche man beim Auswerten von Daten stolpern kann:</p>
-
-        <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;">
-            <button class="has-tooltip" data-tooltip="Ist ein statistisches Lagemaß, das den Wert in der Mitte einer nach Größe sortierten Datenreihe angibt." style="padding:8px 12px; border-radius:6px; border:1px solid #ccc; background:#fff; cursor:pointer;">Median</button>
-
-            <button class="has-tooltip" data-tooltip="Auch arithmetisches Mittel genannt, ist ein statistischer Durchschnittswert." style="padding:8px 12px; border-radius:6px; border:1px solid #ccc; background:#fff; cursor:pointer;">Mittelwert</button>
-
-            <button class="has-tooltip" data-tooltip="Auch Modalwert genannt, ist der am Häufigsten vorkommende Wert in einem Datensatz und ein Lagemaß." style="padding:8px 12px; border-radius:6px; border:1px solid #ccc; background:#fff; cursor:pointer;">Modus</button>
-        </div>
-
-        <p class="help" style="margin-top:12px;">Fahre mit der Maus über die Buttons, um die Beschreibungen zu sehen.</p>
     </div>
-</div>
-
-
 
 
 
 
 
 <!-- Hotspot 2 (Salzstreuer) -->
-<img id="hotspot2" 
-class="hotspot" 
-src="Medien/Salzstreuer.png" 
-data-open-src="Medien/Salzstreuer1.png" 
-alt="Salzstreuer" 
-style="left:23%; top:12%; width:20px;">
-<!-- Modal 2 -->
-<div class="modal-overlay" id="modal2">
-  <div class="modal">
-    <button class="close-btn" onclick="closeModal('modal2')">Schließen</button>
-    <h2>Sprachwissenschaften 1</h2>
+<span class="hotspot-wrapper" data-name="Terminologiemanagement" style="left:33.5%; top:12%;">
+    <img id="hotspot2" class="hotspot"
+         src="Medien/Salzstreuer.png" 
+         data-open-src="Medien/Salzstreuer1.png" 
+         alt="Salzstreuer" 
+         style="width:20px;">
+</span>
+    <!-- Modal 2 -->
+    <div class="modal-overlay" id="modal2">
+        <div class="modal">
+            <button class="close-btn" onclick="closeModal('modal2')">Schließen</button>
+            <h2>Terminologiemanagement</h2>
 
-    <p>Um die verschiedenen Arten von Nebensätzen zu lernen, sucht man sich am Besten Beispiele. Hier sind ein paar Beispiele von Nebensätzen.</p>
+            <p>Terminologiemanagement bezeichnet das systematische Erfassen, Prüfen, Dokumentieren und Einsetzen von fachlichen Begriffen und Benennungen in einem Unternehmen oder einer Organisation. Ziel ist es, dafür zu sorgen, dass wichtige Begriffe (z.B.
+                Produktnamen, technische Bezeichnungen, Abkürzungen) einheitlich, korrekt und verständlich verwendet werden – in allen Texten, Sprachen und Abteilungen.
+                <br>Kurz gesagt: Terminologiemanagement schafft klare, konsistente Fachsprache und vermeidet Missverständnisse.
+            </p>
 
-    <div style="overflow:auto; margin-top:8px;">
-      <table style="width:100%; border-collapse:collapse;">
-        <thead>
-          <tr style="background:#f2f2f2; text-align:left;">
-            <th style="padding:8px; border:1px solid #ddd; width:35%;">Art</th>
-            <th style="padding:8px; border:1px solid #ddd;">Beispiel</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr><td style="padding:8px; border:1px solid #ddd;">Subjektsatz</td><td style="padding:8px; border:1px solid #ddd;">Dass du heute kommst,…</td></tr>
-          <tr><td style="padding:8px; border:1px solid #ddd;">Konditionalsatz</td><td style="padding:8px; border:1px solid #ddd;">…, wenn es heute regnet.</td></tr>
-          <tr><td style="padding:8px; border:1px solid #ddd;">Kausalsatz</td><td style="padding:8px; border:1px solid #ddd;">Weil sie krank ist,…</td></tr>
-          <tr><td style="padding:8px; border:1px solid #ddd;">Konzessivsatz</td><td style="padding:8px; border:1px solid #ddd;">…, obwohl sie früh dran waren.</td></tr>
-          <tr><td style="padding:8px; border:1px solid #ddd;">Konsekutivsatz</td><td style="padding:8px; border:1px solid #ddd;">Ohne dass er Erfolg hatte,…</td></tr>
-          <tr><td style="padding:8px; border:1px solid #ddd;">Finalsatz</td><td style="padding:8px; border:1px solid #ddd;">…, damit sie gesund wird.</td></tr>
-          <tr><td style="padding:8px; border:1px solid #ddd;">Modalsatz</td><td style="padding:8px; border:1px solid #ddd;">Indem sie sich leise anpirschen,…</td></tr>
-          <tr><td style="padding:8px; border:1px solid #ddd;">Indirekter Fragesatz</td><td style="padding:8px; border:1px solid #ddd;">…, ob das so gut ist.</td></tr>
-        </tbody>
-      </table>
+            <div style="overflow:auto; margin-top:8px;">
+                <table style="width:100%; border-collapse:collapse;">
+                    <thead>
+                        <tr style="background:#f2f2f2; text-align:left;">
+                            <th style="padding:8px; border:1px solid #ddd; width:35%;">Benennung</th>
+                            <th style="padding:8px; border:1px solid #ddd;">Definition</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style="padding:8px; border:1px solid #ddd;">Terminologie</td>
+                            <td style="padding:8px; border:1px solid #ddd;">Gesamtheit der fachlichen Benennungen und Begriffe eines bestimmten Fachgebiets oder Unternehmens.</td>
+                        </tr>
+                        <tr>
+                            <td style="padding:8px; border:1px solid #ddd;">Terminologiedatenbank</td>
+                            <td style="padding:8px; border:1px solid #ddd;">Zentrale, strukturierte Sammlung terminologischer Einträge (Begriffe, Benennungen, Definitionen, Zusatzinformationen), die zur Sicherstellung konsistenter Fachsprache genutzt wird.</td>
+                        </tr>
+                        <tr>
+                            <td style="padding:8px; border:1px solid #ddd;">Begriff</td>
+                            <td style="padding:8px; border:1px solid #ddd;">Gedankliche Einheit, die durch charakteristische Merkmale ein Objekt, einen Sachverhalt oder eine Vorstellung eindeutig beschreibt.</td>
+                        </tr>
+                        <tr>
+                            <td style="padding:8px; border:1px solid #ddd;">Benennung</td>
+                            <td style="padding:8px; border:1px solid #ddd;">Sprachliche Ausdrucksform eines Begriffs, z. B. ein Wort, eine Wortgruppe, ein Symbol oder eine Abkürzung.</td>
+                        </tr>
+                        <tr>
+                            <td style="padding:8px; border:1px solid #ddd;">Definition</td>
+                            <td style="padding:8px; border:1px solid #ddd;">Aussage, die den Inhalt eines Begriffs durch Beschreibung seiner wesentlichen Merkmale genau festlegt.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
-  </div>
-</div>
 
 
 
-
-
-
-
-
-<!-- Hotspot 3 (Teller) -->
-<img id="hotspot3" 
-class="hotspot" 
-src="Medien/Teller.png" 
-data-open-src="Medien/Teller1.png" 
-alt="Teller" 
-style="left:80%; top:60%; width: 80px;">
-<!-- Modal 3 -->
+<!-- Hotspot 3  -->
+<span class="hotspot-wrapper" data-name="Visuelle Kommunikation" style="left:37%; top:14%;">
+    <img id="hotspot3" class="hotspot" data-name="Leer"
+        src="Medien/Gewürze.png"
+        data-open-src="Medien/Gewürze1.png"
+        alt="Gewürze"
+        style="width:80px;">
+</span>
+<!-- Modal 3  -->
 <div class="modal-overlay" id="modal3">
-  <div class="modal">
-    <button class="close-btn" onclick="closeModal('modal3')">Schließen</button>
-    <h2>Grundlagen Gestaltung</h2>
+    <div class="modal">
+        <button class="close-btn" onclick="closeModal('modal3')">Schließen</button>
 
-    <p>Zum Gestalten von Grafiken, Flyern, Posts, Magazinen usw. kann man verschiedene Programme verwenden.</p>
-    <p>Die Adobe Programme werden oft von Firmen verwendet, um den Einstieg zu erleichtern, gibt es mehrere Tutorialvideos von Kreativen auf YouTube.</p>
+        <h2>Visuelle Kommunikation</h2>
 
-    <!-- Adobe Links als Buttons mit Icons -->
-    <div style="display:flex; flex-direction:column; gap:8px; margin-top:10px;">
-        <a class="link-button" href="https://youtu.be/3NBKRywEbNs?si=tRVhnZkZDoQV_XGF" target="_blank">
-            <svg width="36" height="36" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img">
-                <rect width="36" height="36" rx="6" fill="#ff9a00"></rect>
-                <text x="18" y="23" font-family="Arial" font-size="14" fill="#fff" font-weight="700" text-anchor="middle">Ai</text>
-            </svg>
-            <div>
-                <div style="font-weight:600;">Illustrator</div>
-                <div style="font-size:13px; color:#555;">Tutorial ansehen (YouTube)</div>
+        <p>
+            Visuelle Kommunikation umfasst alle gestalterischen Elemente einer Marke.  
+            Dazu gehören <strong>Brand Guidelines</strong>, die Regeln für Farben, Typografie und Bildwelt definieren,  
+            das <strong>Corporate Design</strong> als visuelles Erscheinungsbild sowie die umfassende  
+            <strong>Corporate Identity</strong>, die Werte, Positionierung und Persönlichkeit des Unternehmens vermittelt.
+        </p>
+
+        <!-- Bildslider -->
+        <div class="slider-container">
+            <button class="nav-btn" onclick="moveSlide(-1)">&#10094;</button>
+
+            <div class="slider-window">
+                <div class="slides" id="slides">
+                    <img src="Medien/1_VK.png" alt="Bild 1">
+                    <img src="Medien/2_VK.png" alt="Bild 2">
+                    <img src="Medien/3_VK.png" alt="Bild 3">
+                    <img src="Medien/4_VK.png" alt="Bild 4">
+                    <img src="Medien/5_VK.png" alt="Bild 5">
+                    <img src="Medien/6_VK.png" alt="Bild 6">
+                    <img src="Medien/7_VK.png" alt="Bild 7">
+                    <img src="Medien/8_VK.png" alt="Bild 8">
+                </div>
             </div>
-        </a>
 
-        <a class="link-button" href="https://youtu.be/wF_fu1wcT0Y?si=viaFIvuiWSaijC8Z" target="_blank">
-            <svg width="36" height="36" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img">
-                <rect width="36" height="36" rx="6" fill="#ff3366"></rect>
-                <text x="18" y="23" font-family="Arial" font-size="14" fill="#fff" font-weight="700" text-anchor="middle">Id</text>
-            </svg>
-            <div>
-                <div style="font-weight:600;">InDesign</div>
-                <div style="font-size:13px; color:#555;">Tutorial ansehen (YouTube)</div>
-            </div>
-        </a>
-
-        <a class="link-button" href="https://youtu.be/xTzvQkOll2U?si=orQbilAffnwwcCaR" target="_blank">
-            <svg width="36" height="36" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img">
-                <rect width="36" height="36" rx="6" fill="#31a8ff"></rect>
-                <text x="18" y="23" font-family="Arial" font-size="14" fill="#fff" font-weight="700" text-anchor="middle">Ps</text>
-            </svg>
-            <div>
-                <div style="font-weight:600;">Photoshop</div>
-                <div style="font-size:13px; color:#555;">Tutorial ansehen (YouTube)</div>
-            </div>
-        </a>
+            <button class="nav-btn" onclick="moveSlide(1)">&#10095;</button>
+        </div>
     </div>
-
-    <p style="margin-top:12px;">Es gibt auch gute kostenfreie Alternativen zu den Programmen.</p>
-
-    <!-- Kostenfreie Alternativen Buttons -->
-    <div style="display:flex; flex-direction:column; gap:8px; margin-top:8px;">
-        <a class="link-button" href="https://www.canva.com/de_de/herunterladen/windows/" target="_blank">
-            <svg width="36" height="36" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img">
-                <circle cx="18" cy="18" r="18" fill="#00c4a7"></circle>
-                <text x="18" y="23" font-family="Arial" font-size="14" fill="#fff" font-weight="700" text-anchor="middle">C</text>
-            </svg>
-            <div>
-                <div style="font-weight:600;">Canva</div>
-                <div style="font-size:13px; color:#555;">Zur Website</div>
-            </div>
-        </a>
-
-        <a class="link-button" href="https://www.affinity.studio/de_de/download" target="_blank">
-            <svg width="36" height="36" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img">
-                <rect width="36" height="36" rx="6" fill="#7b61ff"></rect>
-                <text x="18" y="23" font-family="Arial" font-size="14" fill="#fff" font-weight="700" text-anchor="middle">A</text>
-            </svg>
-            <div>
-                <div style="font-weight:600;">Affinity</div>
-                <div style="font-size:13px; color:#555;">Zur Website</div>
-            </div>
-        </a>
-    </div>
-  </div>
 </div>
-
-
-
-
-
-
 
 
 <!-- Hotspot 4 (Schneidebrett) -->
-<img id="hotspot4" 
-class="hotspot" 
-src="Medien/Schneidebrett.png" 
-data-open-src="Medien/Schneidebrett1.png" 
-alt="Schneidebrett" 
-style="left:90%; top:60%; width:150px;">
-<!-- Modal 4 -->
-<div class="modal-overlay" id="modal4">
-  <div class="modal">
-    <button class="close-btn" onclick="closeModal('modal4')">Schließen</button>
+<span class="hotspot-wrapper" data-name="Sprachwissenschaft und Sprachkompetenz" style="left:90%; top:60%;">
+    <img id="hotspot4" class="hotspot"
+         src="Medien/Schneidebrett.png"
+         data-open-src="Medien/Schneidebrett1.png"
+         alt="Schneidebrett"
+         style="width:150px;">
+</span>
+    <!-- Modal 4 -->
+    <div class="modal-overlay" id="modal4">
+        <div class="modal">
+            <button class="close-btn" onclick="closeModal('modal4')">Schließen</button>
 
-    <h2>Professionelles Deutsch</h2>
+            <h2>Sprachwissenschaft und Sprachkompetenz</h2>
 
-    <div class="interview" aria-label="Interview">
-        <p class="speaker">Interview</p>
+            <div class="interview" aria-label="Interview">
+                <p class="speaker">Interview</p>
 
-        <p><span class="speaker">Interviewer:</span> Warum haben Sie sich für das Studium Kommunikation und Medienmanagement entschieden?</p>
-        <p><span class="speaker">Studentin:</span> Ich habe mich schon immer für Medien, kreative Prozesse und strategische Kommunikation interessiert. Das Studium vereint all diese Bereiche perfekt.</p>
+                <p><span class="speaker">Interviewer:</span> Warum haben Sie sich für das Studium Kommunikation und Medienmanagement entschieden?</p>
+                <p><span class="speaker">Studentin:</span> Ich habe mich schon immer für Medien, kreative Prozesse und strategische Kommunikation interessiert. Das Studium vereint all diese Bereiche perfekt.</p>
 
-        <p><span class="speaker">Interviewer:</span> Was gefällt Ihnen am meisten an Ihrem Studienalltag?</p>
-        <p><span class="speaker">Studentin:</span> Mir gefällt besonders die Kombination aus Praxisprojekten und theoretischen Grundlagen. Außerdem arbeite ich gerne im Team, was im Studium sehr häufig vorkommt.</p>
+                <p><span class="speaker">Interviewer:</span> Was gefällt Ihnen am meisten an Ihrem Studienalltag?</p>
+                <p><span class="speaker">Studentin:</span> Mir gefällt besonders die Kombination aus Praxisprojekten und theoretischen Grundlagen. Außerdem arbeite ich gerne im Team, was im Studium sehr häufig vorkommt.</p>
 
-        <p><span class="speaker">Interviewer:</span> Gibt es besondere Herausforderungen?</p>
-        <p><span class="speaker">Studentin:</span> Ja, vor allem das Zeitmanagement. Es gibt viele Projekte, Präsentationen und Gruppenarbeiten gleichzeitig. Man muss wirklich gut organisiert sein.</p>
+                <p><span class="speaker">Interviewer:</span> Gibt es besondere Herausforderungen?</p>
+                <p><span class="speaker">Studentin:</span> Ja, vor allem das Zeitmanagement. Es gibt viele Projekte, Präsentationen und Gruppenarbeiten gleichzeitig. Man muss wirklich gut organisiert sein.</p>
 
-        <p><span class="speaker">Interviewer:</span> Welche beruflichen Ziele haben Sie nach dem Abschluss?</p>
-        <p><span class="speaker">Studentin:</span> Ich möchte gerne in eine Kommunikationsagentur gehen oder später im Bereich Social Media Management arbeiten. Kreativität und strategisches Denken zu verbinden, ist genau mein Ding.</p>
+                <p><span class="speaker">Interviewer:</span> Welche beruflichen Ziele haben Sie nach dem Abschluss?</p>
+                <p><span class="speaker">Studentin:</span> Ich möchte gerne in eine Kommunikationsagentur gehen oder später im Bereich Social Media Management arbeiten. Kreativität und strategisches Denken zu verbinden, ist genau mein Ding.</p>
+            </div>
+
+            <div class="konjunktiv" aria-label="Konjunktiv II Text">
+                <p><strong>Text im Konjunktiv 2</strong></p>
+                <p>Die Studentin erzählte, sie habe sich für das Studium entschieden, weil sie sich schon immer für Medien, kreative Prozesse und strategische Kommunikation interessiert hätte. Das Studium vereine all diese Bereiche auf ideale Weise.</p>
+
+                <p>Sie meinte, am meisten würde ihr die Mischung aus Praxisprojekten und theoretischen Grundlagen gefallen. Besonders gerne würde sie im Team arbeiten, was im Studienalltag sehr häufig vorkäme.</p>
+
+                <p>Auf die Herausforderungen angesprochen, sagte sie, vor allem das Zeitmanagement wäre anspruchsvoll. Es gebe viele Projekte, Präsentationen und Gruppenarbeiten gleichzeitig, weshalb man sehr gut organisiert sein müsse.</p>
+
+                <p>Zu ihren Zukunftsplänen erklärte sie, sie würde nach dem Abschluss gerne in einer Kommunikationsagentur arbeiten oder später im Social Media Management tätig sein. Es mache ihr Freude, Kreativität mit strategischem Denken zu verbinden.</p>
+            </div>
+
+            <!-- Audio: Vorlesen lassen -->
+            <div style="margin-top:12px;">
+                <audio id="modal4-audio" src="Medien/vorlesen_konjunktiv2.mp3" preload="none"></audio>
+                <button id="modal4-audio-btn" class="audio-button" aria-pressed="false" aria-label="Vorlesen lassen">▶ Vorlesen lassen</button>
+            </div>
+        </div>
     </div>
-
-    <div class="konjunktiv" aria-label="Konjunktiv II Text">
-        <p><strong>Text im Konjunktiv 2</strong></p>
-        <p>Die Studentin erzählte, sie habe sich für das Studium entschieden, weil sie sich schon immer für Medien, kreative Prozesse und strategische Kommunikation interessiert hätte. Das Studium vereine all diese Bereiche auf ideale Weise.</p>
-
-        <p>Sie meinte, am meisten würde ihr die Mischung aus Praxisprojekten und theoretischen Grundlagen gefallen. Besonders gerne würde sie im Team arbeiten, was im Studienalltag sehr häufig vorkäme.</p>
-
-        <p>Auf die Herausforderungen angesprochen, sagte sie, vor allem das Zeitmanagement wäre anspruchsvoll. Es gebe viele Projekte, Präsentationen und Gruppenarbeiten gleichzeitig, weshalb man sehr gut organisiert sein müsse.</p>
-
-        <p>Zu ihren Zukunftsplänen erklärte sie, sie würde nach dem Abschluss gerne in einer Kommunikationsagentur arbeiten oder später im Social Media Management tätig sein. Es mache ihr Freude, Kreativität mit strategischem Denken zu verbinden.</p>
-    </div>
-
-    <!-- Audio: Vorlesen lassen -->
-    <div style="margin-top:12px;">
-      <audio id="modal4-audio" src="Medien/vorlesen_konjunktiv2.mp3" preload="none"></audio>
-      <button id="modal4-audio-btn" class="audio-button" aria-pressed="false" aria-label="Vorlesen lassen">▶ Vorlesen lassen</button>
-    </div>
-  </div>
-</div>
-
-
 
 
 
 
 <!-- Hotspot 5 (Anleitung) -->
-<img id="hotspot5" 
-class="hotspot" 
-src="Medien/Anleitung.png" 
-data-open-src="Medien/Anleitung1.png" 
-alt="Anleitung" 
-style="left:62%; top:10%; width:40px;">
-<!-- Modal 5 -->
-<div class="modal-overlay" id="modal5">
-  <div class="modal">
-    <button class="close-btn" onclick="closeModal('modal5')">Schließen</button>
-    <h2> Technische Dokumentation 1</h2>
+<span class="hotspot-wrapper" data-name="Technische Dokumentation" style="left:62%; top:10%;">
+    <img id="hotspot5" class="hotspot"
+         src="Medien/Anleitung.png"
+         data-open-src="Medien/Anleitung1.png"
+         alt="Anleitung"
+         style="width:40px;">
+</span>
+    <!-- Modal 5 -->
+    <div class="modal-overlay" id="modal5">
+        <div class="modal">
+            <button class="close-btn" onclick="closeModal('modal5')">Schließen</button>
+            <h2> Technische Dokumentation</h2>
 
-    <!-- Warning box with two warnings -->
-    <div class="warning-box" role="alert" aria-live="polite">
-      <div class="warn">Warnhinweise zum Toaster</div>
-      <ul class="warning-list">
-        <li><strong></strong> Ziehe niemals das Netzkabel am Gerät, wenn es funktionsgestört ist. Trenne das Gerät vorher vom Stromnetz.</li>
-        <li><strong></strong> Benutze den Toaster nicht in der Nähe von Wasser oder feuchten Flächen — Gefahr eines elektrischen Schlages.</li>
-      </ul>
+            <!-- Warning box with two warnings -->
+            <div class="warning-box" role="alert" aria-live="polite">
+                <div class="warn">Warnhinweise zum Toaster</div>
+                <ul class="warning-list">
+                    <li><strong></strong> Ziehe niemals das Netzkabel am Gerät, wenn es funktionsgestört ist. Trenne das Gerät vorher vom Stromnetz.</li>
+                    <li><strong></strong> Benutze den Toaster nicht in der Nähe von Wasser oder feuchten Flächen — Gefahr eines elektrischen Schlages.</li>
+                </ul>
+            </div>
+
+            <!-- Central image mit 3 semi-transparent dots -->
+            <div class="image-area" aria-hidden="false">
+                <div class="image-wrapper" role="img" aria-label="Toaster mit Informationspunkten">
+                    <img src="Medien/Toaster.png" alt="Toaster Abbildung">
+                    <!-- Dot 1 (links unten) -->
+                    <div class="info-dot" style="left:18%; top:87%;" tabindex="0" aria-describedby="dot1">
+                        <div class="dot-tip" id="dot1">Stecker: Vor dem Reinigen immer vom Strom trennen.</div>
+                    </div>
+                    <!-- Dot 2 (Mitte) -->
+                    <div class="info-dot" style="left:50%; top:50%;" tabindex="0" aria-describedby="dot2">
+                        <div class="dot-tip" id="dot2">Schlitze: Krümel regelmäßig entfernen, um Brandgefahr zu vermeiden.</div>
+                    </div>
+                    <!-- Dot 3 (rechts oben) -->
+                    <div class="info-dot" style="left:82%; top:30%;" tabindex="0" aria-describedby="dot3">
+                        <div class="dot-tip" id="dot3">Gehäuse: Nicht mit scharfen Reinigungsmitteln behandeln.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!--  infobox Funktionsdesign -->
+            <div class="infobox" role="note" aria-live="polite">
+                <strong>Was ist Funktionsdesign?</strong>
+                <p style="margin:6px 0 0 0;">Funktionsdesign ist eine Standardisierungs- und Strukturierungsmethode für die Technische Dokumentation und Technische Kommunikation, welche auch bei Anleitungen eine besondere Rolle spielt.</p>
+            </div>
+
+        </div>
     </div>
 
-    <!-- Central image mit 3 semi-transparent dots -->
-    <div class="image-area" aria-hidden="false">
-      <div class="image-wrapper" role="img" aria-label="Toaster mit Informationspunkten">
-        <img src="Medien/Toaster.png" alt="Toaster Abbildung">
-        <!-- Dot 1 (links unten) -->
-        <div class="info-dot" style="left:18%; top:87%;" tabindex="0" aria-describedby="dot1">
-          <div class="dot-tip" id="dot1">Stecker: Vor dem Reinigen immer vom Strom trennen.</div>
-        </div>
-        <!-- Dot 2 (Mitte) -->
-        <div class="info-dot" style="left:50%; top:50%;" tabindex="0" aria-describedby="dot2">
-          <div class="dot-tip" id="dot2">Schlitze: Krümel regelmäßig entfernen, um Brandgefahr zu vermeiden.</div>
-        </div>
-        <!-- Dot 3 (rechts oben) -->
-        <div class="info-dot" style="left:82%; top:30%;" tabindex="0" aria-describedby="dot3">
-          <div class="dot-tip" id="dot3">Gehäuse: Nicht mit scharfen Reinigungsmitteln behandeln.</div>
-        </div>
-      </div>
-    </div>
+<!-- Hotspot 6 (Wecker) -->
+<span class="hotspot-wrapper" data-name="IT Grundlagen" style="left:60%; top:43%;">
+    <img id="hotspot6" class="hotspot"
+         src="Medien/Wecker.png"
+         data-open-src="Medien/Wecker1.png"
+         alt="Wecker"
+         style="width:46px;">
+</span>
+    <!-- Modal 6: Hilfetext + Video mit Zeitstempeln -->
+    <div class="modal-overlay" id="modal6">
+        <div class="modal">
+            <button class="close-btn" onclick="closeModal('modal6')">Schließen</button>
+            <h2>IT Grundlagen</h2>
 
-    <!--  infobox Funktionsdesign -->
-    <div class="infobox" role="note" aria-live="polite">
-      <strong>Was ist Funktionsdesign?</strong>
-      <p style="margin:6px 0 0 0;">Funktionsdesign ist eine Standardisierungs- und Strukturierungsmethode für die Technische Dokumentation und Technische Kommunikation, welche auch bei Anleitungen eine besondere Rolle spielt.</p>
-    </div>
+            <!-- Hilfetext -->
+            <p style="margin-top:6px;">Im Modul „IT-Grundlagen“ lernt man zentrale Bereiche der Informatik kennen. Dabei zeigt sich, dass Programmieren überall auftauchen kann, selbst dort, wo man es nicht erwartet, etwa in Word mit VBA, um Abläufe zu automatisieren.</p>
 
-  </div>
-</div>
-
-
-
-
-
-
-
-
-<!--  Hotspot 6 (Wecker) -->
-<img id="hotspot6" 
-class="hotspot" 
-src="Medien/Wecker.png" 
-data-open-src="Medien/Wecker1.png" 
-alt="Wecker" 
-style="left:60%; top:43%; width:46px;">
-<!-- Modal 6: Hilfetext + Video mit Zeitstempeln -->
-<div class="modal-overlay" id="modal6">
-  <div class="modal">
-    <button class="close-btn" onclick="closeModal('modal6')">Schließen</button>
-    <h2>IT Grundlagen 1</h2>
-
-    <!-- Hilfetext -->
-    <p style="margin-top:6px;">Wie kann man mit VBA ein kleines Spiel in Word programmieren? Das Video bietet eine Schritt-für-Schritt Anleitung</p>
-
-    <!-- Video-Bereich mit Steuerung für Sprünge zu Zeitstempeln -->
-    <div class="video-container">
-        <video id="help-video" controls preload="metadata" style="max-width:100%; border-radius:8px; background:#000;">
-            <source src="Medien/vba.mp4" type="video/mp4">
+            <!-- Video-Bereich mit Steuerung für Sprünge zu Zeitstempeln -->
+            <div class="video-container">
+                <video class="jump-video" controls preload="metadata" style="max-width:100%; border-radius:8px; background:#000;">
+            <source src="Medien/vba-video.mp4" type="video/mp4">
             Dein Browser unterstützt das Video-Tag nicht.
-        </video>
-
-        <!-- Benutzerfreundliche Sprung-Steuerungen -->
-        <div class="video-controls" role="toolbar" aria-label="Video Sprungsteuerung">
-            <!-- Einige praktische Sprungmarken (Beispiel: 0:00, 0:30, 1:15, 2:00) -->
-            <button type="button" data-seconds="0" class="jump-to">Start (0:00)</button>
-            <button type="button" data-seconds="30" class="jump-to">0:30</button>
-            <button type="button" data-seconds="75" class="jump-to">1:15</button>
-            <button type="button" data-seconds="120" class="jump-to">2:00</button>
-
-            <!-- Kleine Sprung-Buttons +/- 10s sowie Play -->
-            <button type="button" id="back-10">« -10s</button>
-            <button type="button" id="play-pause">▶ Play</button>
-            <button type="button" id="forward-10">+10s »</button>
-
-            <!-- Anzeige der aktuellen Zeit (wird dynamisch aktualisiert) -->
-            <div id="time-display" aria-live="polite" style="margin-left:8px; min-width:80px; text-align:left;">0:00 / 0:00</div>
+                </video>
+            </div>
         </div>
     </div>
-
-  </div>
-</div>
-
-
-
-
 
 <!-- Hotspot 7 (Mixer) -->
-<img id="hotspot7" 
-class="hotspot" 
-src="Medien/Mixer.png" 
-data-open-src="Medien/Mixer1.png" 
-alt="Mixer" 
-style="left:35%; top:40%; width:80px;">
+<span class="hotspot-wrapper" data-name="Interkulturelle Kommunikation" style="left:35%; top:40%;">
+    <img id="hotspot7" class="hotspot"
+         src="Medien/Mixer.png"
+         data-open-src="Medien/Mixer1.png"
+         alt="Mixer"
+         style="width:80px;">
+</span>
+    <!-- Modal 7 -->
+    <div class="modal-overlay" id="modal7">
+        <div class="modal">
+            <button class="close-btn" onclick="closeModal('modal7')">Schließen</button>
+            <h2>Interkulturelle Kommunikation</h2>
 
-<!-- Modal 7 -->
-<div class="modal-overlay" id="modal7">
-    <div class="modal">
-        <button class="close-btn" onclick="closeModal('modal7')">Schließen</button>
-        <h2>IT Grundlagen 2</h2>
-
-        <div style="margin:12px 0;">
-            <button class="has-tooltip" data-tooltip="Ist die Methode zur systematischen Beschreibung und Verdichtung von Daten mithilfe von Kennzahlen, Tabellen und Grafiken." style="padding:8px 12px; border-radius:6px; border:1px solid #ccc; background:#f5f5f5; cursor:pointer;">
-                Deskriptive Statistik
+            <div style="margin:12px 0;">
+                <button class="modal-tooltip" data-tooltip="Fähigkeit, mit Menschen aus anderen Kulturen respektvoll, angemessen und wirksam zu kommunizieren und Missverständnisse konstruktiv zu lösen." style="padding:8px 12px; border-radius:6px; border:1px solid #ccc; background:#f5f5f5; cursor:pointer;">
+                Interkulturelle Kompetenz
             </button>
+            </div>
+
+            <p>Hier sind ein paar Benennungen, über welche man im Themenbereich zu Interkulturelle Kommunikation stolpern kann:</p>
+
+            <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;">
+                <button class="modal-tooltip" data-tooltip="Gemeinsames System von Werten, Normen, Bedeutungen und Verhaltensweisen, das das Denken und Handeln einer Gruppe prägt." style="padding:8px 12px; border-radius:6px; border:1px solid #ccc; background:#fff; cursor:pointer;">Kultur</button>
+
+                <button class="modal-tooltip" data-tooltip="Vereinfachtes, verallgemeinerndes Bild über eine Gruppe von Menschen, das individuelle Unterschiede ausblendet." style="padding:8px 12px; border-radius:6px; border:1px solid #ccc; background:#fff; cursor:pointer;">Stereotyp</button>
+
+                <button class="modal-tooltip" data-tooltip="Verunsicherung oder Stressreaktion, die entsteht, wenn Menschen in eine fremde Kultur eintauchen und gewohnte Orientierungsmuster nicht mehr funktionieren." style="padding:8px 12px; border-radius:6px; border:1px solid #ccc; background:#fff; cursor:pointer;">Kulturschock</button>
+            </div>
+
+            <p class="help" style="margin-top:12px;">Fahre mit der Maus über die Buttons, um die Beschreibungen zu sehen.</p>
         </div>
-
-        <p>Hier sind ein paar Benennungen, über welche man beim Auswerten von Daten stolpern kann:</p>
-
-        <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;">
-            <button class="has-tooltip" data-tooltip="Ist ein statistisches Lagemaß, das den Wert in der Mitte einer nach Größe sortierten Datenreihe angibt." style="padding:8px 12px; border-radius:6px; border:1px solid #ccc; background:#fff; cursor:pointer;">Median</button>
-
-            <button class="has-tooltip" data-tooltip="Auch arithmetisches Mittel genannt, ist ein statistischer Durchschnittswert." style="padding:8px 12px; border-radius:6px; border:1px solid #ccc; background:#fff; cursor:pointer;">Mittelwert</button>
-
-            <button class="has-tooltip" data-tooltip="Auch Modalwert genannt, ist der am Häufigsten vorkommende Wert in einem Datensatz und ein Lagemaß." style="padding:8px 12px; border-radius:6px; border:1px solid #ccc; background:#fff; cursor:pointer;">Modus</button>
-        </div>
-
-        <p class="help" style="margin-top:12px;">Fahre mit der Maus über die Buttons, um die Beschreibungen zu sehen.</p>
     </div>
-</div>
 
 
-
-
-
-
-<!-- Hotspot 8 (Salzstreuer) -->
-<img id="hotspot8" 
-class="hotspot" 
-src="Medien/Pfefferstreuer.png" 
-data-open-src="Medien/Pfefferstreuer1.png" 
-alt="Pfefferstreuer" 
-style="left:25%; top:12%; width:20px;">
+<!-- Hotspot 8 (Pfefferstreuer) -->
+<span class="hotspot-wrapper" data-name="Sprache und Gestaltung" style="left:32%; top:12%;">
+    <img id="hotspot8" class="hotspot"
+         src="Medien/Pfefferstreuer.png"
+         data-open-src="Medien/Pfefferstreuer1.png"
+         alt="Pfefferstreuer"
+         style="width:20px;">
+</span>
 <!-- Modal 8 -->
 <div class="modal-overlay" id="modal8">
-  <div class="modal">
-    <button class="close-btn" onclick="closeModal('modal8')">Schließen</button>
-    <h2>Sprachwissenschaften 2</h2>
+    <div class="modal">
+        <button class="close-btn" onclick="closeModal('modal8')">Schließen</button>
 
-    <p>...</p>
+        <h2>Sprache und Gestaltung</h2>
 
-    <div style="overflow:auto; margin-top:8px;">
-      <table style="width:100%; border-collapse:collapse;">
-        <thead>
-          <tr style="background:#f2f2f2; text-align:left;">
-            <th style="padding:8px; border:1px solid #ddd; width:35%;">Art</th>
-            <th style="padding:8px; border:1px solid #ddd;">Beispiel</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr><td style="padding:8px; border:1px solid #ddd;">...</td><td style="padding:8px; border:1px solid #ddd;">...</td></tr>
-          <tr><td style="padding:8px; border:1px solid #ddd;">...</td><td style="padding:8px; border:1px solid #ddd;">...</td></tr>
-          <tr><td style="padding:8px; border:1px solid #ddd;">...</td><td style="padding:8px; border:1px solid #ddd;">...</td></tr>
-          <tr><td style="padding:8px; border:1px solid #ddd;">...</td><td style="padding:8px; border:1px solid #ddd;">...</td></tr>
-          <tr><td style="padding:8px; border:1px solid #ddd;">...</td><td style="padding:8px; border:1px solid #ddd;">...</td></tr>
-          <tr><td style="padding:8px; border:1px solid #ddd;">...</td><td style="padding:8px; border:1px solid #ddd;">...</td></tr>
-          <tr><td style="padding:8px; border:1px solid #ddd;">...</td><td style="padding:8px; border:1px solid #ddd;">...</td></tr>
-          <tr><td style="padding:8px; border:1px solid #ddd;">...</td><td style="padding:8px; border:1px solid #ddd;">...</td></tr>
-        </tbody>
-      </table>
+        <!-- Fragekasten der sich bei Klick ausfährt -->
+        <details class="infobox">
+            <summary><strong>Was haben Worte und Typografie gemeinsam?</strong></summary>
+
+            <p style="margin-top:8px;">
+                Worte bedeuten – Typografie deutet. 
+                Die gleiche Aussage kann streng, verspielt, laut oder sachlich erscheinen,
+                je nachdem, wie sie gesetzt wird.
+            </p>
+
+            <p>
+                Darstellung ist nicht Dekoration, sondern Teil der Botschaft.
+                Form und Inhalt wirken immer gemeinsam.
+            </p>
+        </details>
+
+        <details class="infobox">
+            <summary><strong>Morphemelemente – Wie sind Wörter aufgebaut?</strong></summary>
+            <ul style="margin-top:12px;">
+                <li>Präfix (Vorsilbe)</li>
+                <li>Wortstamm</li>
+                <li>Suffix (Nachsilbe)</li>
+                <li>Flexionsendung</li>
+            </ul>
+        </details>
+
+        <!-- Abbildung / Visualisierungshinweis -->
+        <details class="infobox">
+            <summary><strong>Wie verändert Schriftart die Bedeutung und Wirkung eines Wortes?</strong></summary>
+            <p style="margin-top:6px;">
+                Stelle dir ein Wort vor, das in verschiedenen Schriftarten erscheint:
+                <br>→ streng • verspielt • laut • sachlich
+                <br>Die Bedeutung bleibt – die Wirkung ändert sich.
+            </p>
+        </details>
+
+        <p class="help" style="margin-top:10px;">
+            Tipp: Klicke auf den Kasten oben – er fährt aus und zeigt dir die Antwort.
+        </p>
+
     </div>
-  </div>
 </div>
 
 
 
 
-
-
-<!--  Hotspot 9 (Schöpfkelle) -->
-<img id="hotspot9" 
-class="hotspot" 
-src="Medien/Kelle.png" 
-data-open-src="Medien/Kelle1.png" 
-alt="Kelle" 
-style="left:50%; top:36%; width:40px;">
+<!-- Hotspot 9 (Schöpfkelle) -->
+<span class="hotspot-wrapper" data-name="Gestaltung" style="left:50%; top:36%;">
+    <img id="hotspot9" class="hotspot"
+         src="Medien/Kelle.png"
+         data-open-src="Medien/Kelle1.png"
+         alt="Kelle"
+         style="width:40px;">
+</span>
 <!-- Modal 9 -->
-<div class="modal-overlay" id="modal9">
-  <div class="modal">
-    <button class="close-btn" onclick="closeModal('modal9')">Schließen</button>
-    <h2>IT Grundlagen 1</h2>
+    <div class="modal-overlay" id="modal9">
+        <div class="modal">
+            <button class="close-btn" onclick="closeModal('modal9')">Schließen</button>
+            <h2>Gestaltung</h2>
 
-    <!-- Hilfetext -->
-    <p style="margin-top:6px;">Wie wurde der Toaster erstellt? Hier ist eine Anleitung um schnell Illustrationen zu erstellen.</p>
+            <!-- Hilfetext -->
+            <p style="margin-top:6px;">Wie wurde der Toaster erstellt? Hier ist eine Anleitung um schnell Illustrationen zu erstellen.</p>
 
-    <!-- Video-Bereich mit Steuerung für Sprünge zu Zeitstempeln -->
-    <div class="video-container">
-        <video id="help-video" controls preload="metadata" style="max-width:100%; border-radius:8px; background:#000;">
+            <!-- Video-Bereich mit Steuerung für Sprünge zu Zeitstempeln -->
+            <div class="video-container">
+                <video class="jump-video" controls preload="metadata" style="max-width:100%; border-radius:8px; background:#000;">
             <source src="Medien/illustration.mp4" type="video/mp4">
             Dein Browser unterstützt das Video-Tag nicht.
         </video>
 
-        <!-- Benutzerfreundliche Sprung-Steuerungen -->
-        <div class="video-controls" role="toolbar" aria-label="Video Sprungsteuerung">
-            <!-- Einige praktische Sprungmarken (Beispiel: 0:00, 0:30, 1:15, 2:00) -->
-            <button type="button" data-seconds="0" class="jump-to">Start (0:00)</button>
-            <button type="button" data-seconds="30" class="jump-to">0:30</button>
-            <button type="button" data-seconds="75" class="jump-to">1:15</button>
-            <button type="button" data-seconds="120" class="jump-to">2:00</button>
+                <!-- Benutzerfreundliche Sprung-Steuerungen -->
+                <div class="video-controls" role="toolbar" aria-label="Video Sprungsteuerung">
+                    <!-- Einige praktische Sprungmarken  -->
+                    <button type="button" data-seconds="8" class="jump-to">Form erstellen</button>
+                    <button type="button" data-seconds="20" class="jump-to">Farbe anpassen</button>
+                    <button type="button" data-seconds="45" class="jump-to">Kopieren</button>
+                    <button type="button" data-seconds="58" class="jump-to">Gruppieren</button>
+                </div>
+            </div>
 
-            <!-- Kleine Sprung-Buttons +/- 10s sowie Play -->
-            <button type="button" id="back-10">« -10s</button>
-            <button type="button" id="play-pause">▶ Play</button>
-            <button type="button" id="forward-10">+10s »</button>
-
-            <!-- Anzeige der aktuellen Zeit (wird dynamisch aktualisiert) -->
-            <div id="time-display" aria-live="polite" style="margin-left:8px; min-width:80px; text-align:left;">0:00 / 0:00</div>
         </div>
     </div>
-
-  </div>
-</div>
-
-
-
-
-
-
 
 
 <!-- Hotspot 10 (Rezept) -->
-<img id="hotspot10" 
-class="hotspot" 
-src="Medien/Rezept.png" 
-data-open-src="Medien/Rezept1.png" 
-alt="Rezept" 
-style="left:60%; top:10%; width:32px;">
-<!-- Modal 10 -->
-<div class="modal-overlay" id="modal10">
-  <div class="modal">
-    <button class="close-btn" onclick="closeModal('modal10')">Schließen</button>
-    <h2>Technische Dokumentation 2</h2>
+<span class="hotspot-wrapper" data-name="Medienproduktion" style="left:60%; top:10%;">
+    <img id="hotspot10" class="hotspot"
+         src="Medien/Rezept.png"
+         data-open-src="Medien/Rezept1.png"
+         alt="Rezept"
+         style="width:32px;">
+</span>
+    <!-- Modal 10 -->
+    <div class="modal-overlay" id="modal10">
+        <div class="modal">
+            <button class="close-btn" onclick="closeModal('modal10')">Schließen</button>
+            <h2>Medienproduktion</h2>
+            <p>Grundlagen zu Tools, Methoden und Regeln, die dir während des gesamten Studiums begegnen. Du lernst, Medien professionell zu planen, zu gestalten und zu bewerten, immer mit Blick auf Verständlichkeit, Zielgruppe und rechtliche Rahmenbedingungen</p>
 
-    <!-- Warning box with two warnings -->
-    <div class="warning-box" role="alert" aria-live="polite">
-      <div class="warn">Warnhinweise zum Toaster</div>
-      <ul class="warning-list">
-        <li><strong></strong> Ziehe niemals das Netzkabel am Gerät, wenn es funktionsgestört ist. Trenne das Gerät vorher vom Stromnetz.</li>
-        <li><strong></strong> Benutze den Toaster nicht in der Nähe von Wasser oder feuchten Flächen — Gefahr eines elektrischen Schlages.</li>
-      </ul>
+            <!--  infobox Funktionsdesign -->
+            <div class="infobox" role="note" aria-live="polite">
+                <strong>Wie schreibt man eine wissenschaftliche Arbeit?</strong>
+                <ul>
+                    <li>Thema eingrenzen und Fragestellung formulieren</li>
+                    <li>Literaturrecherche durchführen</li>
+                    <li>Gliederung erstellen</li>
+                    <li>Rohfassung schreiben</li>
+                    <li>Überarbeiten und Korrekturlesen</li>
+                </ul>
+            </div>
+            <!--  infobox Funktionsdesign -->
+            <div class="infobox" role="note" aria-live="polite">
+                <strong>Welche rechtlichen Aspekte sind beim Erstellen von Anleitungen zu beachten?</strong>
+                <ul>
+                    <li>Urheberrecht: Nutzung von Bildern, Texten, Software und Screenshots</li>
+                    <li>Lizenzen: Open-Source-, Creative-Commons- und Nutzungsrechte klären</li>
+                    <li>Persönlichkeits- und Datenschutzrechte beachten (z. B. keine identifizierbaren Daten zeigen)</li>
+                    <li>Haftungsausschlüsse und Sicherheitshinweise eindeutig formulieren</li>
+                    <li>kennzeichnungspflichtige Werbung und Produktplatzierungen korrekt ausweisen</li>
+                </ul>
+
+            </div>
+        </div>
     </div>
 
-    <!-- Central image mit 3 semi-transparent dots -->
-    <div class="image-area" aria-hidden="false">
-      <div class="image-wrapper" role="img" aria-label="Toaster mit Informationspunkten">
-        <img src="Medien/Toaster.png" alt="Toaster Abbildung">
-        <!-- Dot 1 (links unten) -->
-        <div class="info-dot" style="left:18%; top:87%;" tabindex="0" aria-describedby="dot1">
-          <div class="dot-tip" id="dot1">Stecker: Vor dem Reinigen immer vom Strom trennen.</div>
-        </div>
-        <!-- Dot 2 (Mitte) -->
-        <div class="info-dot" style="left:50%; top:50%;" tabindex="0" aria-describedby="dot2">
-          <div class="dot-tip" id="dot2">Schlitze: Krümel regelmäßig entfernen, um Brandgefahr zu vermeiden.</div>
-        </div>
-        <!-- Dot 3 (rechts oben) -->
-        <div class="info-dot" style="left:82%; top:30%;" tabindex="0" aria-describedby="dot3">
-          <div class="dot-tip" id="dot3">Gehäuse: Nicht mit scharfen Reinigungsmitteln behandeln.</div>
-        </div>
-      </div>
-    </div>
+<!-- Hotspot 11 (Sieb) -->
+<span class="hotspot-wrapper" data-name="3D-Technologien" style="left:54%; top:36%;">
+    <img id="hotspot11" class="hotspot"
+         src="Medien/Sieb.png"
+         data-open-src="Medien/Sieb1.png"
+         alt="Sieb"
+         style="width:40px;">
+</span>
 
-    <!--  infobox Funktionsdesign -->
-    <div class="infobox" role="note" aria-live="polite">
-      <strong>Was ist Funktionsdesign?</strong>
-      <p style="margin:6px 0 0 0;">Funktionsdesign ist eine Standardisierungs- und Strukturierungsmethode für die Technische Dokumentation und Technische Kommunikation, welche auch bei Anleitungen eine besondere Rolle spielt.</p>
-    </div>
+        <!-- Modal 11 -->
+        <div class="modal-overlay" id="modal11">
+            <div class="modal">
+                <button class="close-btn" onclick="closeModal('modal11')">Schließen</button>
+                <h2>3D-Technologien</h2>
 
-  </div>
-</div>
+                <!-- Hilfetext -->
+                <p style="margin-top:6px;">Wie färbt man ein Objekt in Blender ein?</p>
 
-
-
-
-
-
-
-<!--  Hotspot 11 (Sieb) -->
-<img id="hotspot11" 
-class="hotspot" 
-src="Medien/Sieb.png" 
-data-open-src="Medien/Sieb1.png" 
-alt="Sieb" 
-style="left:54%; top:36%; width:40px;">
-<!-- Modal 11 -->
-<div class="modal-overlay" id="modal11">
-  <div class="modal">
-    <button class="close-btn" onclick="closeModal('modal11')">Schließen</button>
-    <h2>IT Grundlagen 1</h2>
-
-    <!-- Hilfetext -->
-    <p style="margin-top:6px;">Wie wurde der Toaster erstellt? Hier ist eine Anleitung um schnell Illustrationen zu erstellen.</p>
-
-    <!-- Video-Bereich mit Steuerung für Sprünge zu Zeitstempeln -->
-    <div class="video-container">
-        <video id="help-video" controls preload="metadata" style="max-width:100%; border-radius:8px; background:#000;">
-            <source src="Medien/photobearbeitung.mp4" type="video/mp4">
+                <!-- Video-Bereich mit Steuerung für Sprünge zu Zeitstempeln -->
+                <div class="video-container">
+                    <video class="jump-video" controls preload="metadata" style="max-width:100%; border-radius:8px; background:#000;">
+            <source src="Medien/Blender_Video.mp4" type="video/mp4">
             Dein Browser unterstützt das Video-Tag nicht.
         </video>
 
-        <!-- Benutzerfreundliche Sprung-Steuerungen -->
-        <div class="video-controls" role="toolbar" aria-label="Video Sprungsteuerung">
-            <!-- Einige praktische Sprungmarken (Beispiel: 0:00, 0:30, 1:15, 2:00) -->
-            <button type="button" data-seconds="0" class="jump-to">Start (0:00)</button>
-            <button type="button" data-seconds="30" class="jump-to">0:30</button>
-            <button type="button" data-seconds="75" class="jump-to">1:15</button>
-            <button type="button" data-seconds="120" class="jump-to">2:00</button>
+                    <!-- Benutzerfreundliche Sprung-Steuerungen -->
+                    <div class="video-controls" role="toolbar" aria-label="Video Sprungsteuerung">
+                        <!-- Einige praktische Sprungmarken (Beispiel: 0:00, 0:30, 1:15, 2:00) -->
+                        <button type="button" data-seconds="17" class="jump-to">Objekt verändern</button>
+                        <button type="button" data-seconds="50" class="jump-to">Objekt glätten</button>
+                        <button type="button" data-seconds="65" class="jump-to">Objekt färben</button>
+                        <button type="button" data-seconds="107" class="jump-to">Rückgängig machen</button>
+                    </div>
+                </div>
 
-            <!-- Kleine Sprung-Buttons +/- 10s sowie Play -->
-            <button type="button" id="back-10">« -10s</button>
-            <button type="button" id="play-pause">▶ Play</button>
-            <button type="button" id="forward-10">+10s »</button>
-
-            <!-- Anzeige der aktuellen Zeit (wird dynamisch aktualisiert) -->
-            <div id="time-display" aria-live="polite" style="margin-left:8px; min-width:80px; text-align:left;">0:00 / 0:00</div>
+            </div>
         </div>
-    </div>
 
-  </div>
+
+<!-- Hotspot 12 (Backpapier) -->
+<span class="hotspot-wrapper" data-name="Internet Technologien" style="left:56%; top:12%;">
+    <img id="hotspot12" class="hotspot"
+         src="Medien/Backpapier.png"
+         data-open-src="Medien/Backpapier1.png"
+         alt="Backpapier"
+         style="width:90px;">
+</span>
+<!-- Modal 12 -->
+<div class="modal-overlay" id="modal12">
+    <div class="modal">
+        <button class="close-btn" onclick="closeModal('modal12')">Schließen</button>
+
+        <h2>Internet Technologien</h2>
+
+        <!-- Code mit Info-Punkten -->
+        <div class="image-area">
+            <div class="image-wrapper">
+                <img src="Medien/Website_Code.png" alt="Codeansicht">
+
+                <div class="info-dot" style="left:20%; top:25%;">
+                    <div class="dot-tip">Style – In diesem Teil wird das Aussehen der Website bestimmt</div>
+                </div>
+
+                <div class="info-dot" style="left:20%; top:72%;">
+                    <div class="dot-tip">Body – Hier befindet sich der Inhalt der Website</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Website mit Info-Punkten -->
+        <div class="image-area" style="margin-top:12px;">
+            <div class="image-wrapper">
+                <img src="Medien/Website.png" alt="Websitenansicht Beispiel">
+
+                <div class="info-dot" style="left:14%; top:20%;">
+                    <div class="dot-tip">Im Style wird bestimmt,<br> dass das Hintergrundbild das Bild der Küche ist</div>
+                </div>
+
+                <div class="info-dot" style="left:40%; top:42%;">
+                    <div class="dot-tip">Im Body befindet sich ein img-Element, das ist hier das Bild von dem Messbecher</div>
+                </div>
+            </div>
+        </div>
+        <p class="help" style="margin-top:12px;">Fahre mit der Maus über die Punkte, um die Beschreibungen zu sehen.</p>
+    </div>
 </div>
 
 
-<script>
-    /* Allgemeine Modal-Funktionen */
+<!-- Hotspot 13 (Kaffeefilter) -->
+<span class="hotspot-wrapper" data-name="Textlinguistik" style="left:56%; top:15%;">
+    <img id="hotspot13" class="hotspot"
+         src="Medien/Kaffeefilter.png"
+         data-open-src="Medien/Kaffeefilter1.png"
+         alt="Kaffeefilter"
+         style="width:90px;">
+</span>
+<!-- Modal 13 -->
+<div class="modal-overlay" id="modal13">
+    <div class="modal">
+        <button class="close-btn" onclick="closeModal('modal13')">Schließen</button>
 
-    // Öffnet ein Modal (Anzeige 'flex' damit zentriert dargestellt wird)
-    function openModal(id) {
-        document.getElementById(id).style.display = 'flex';
-    }
+        <h2>Textlinguistik</h2>
 
-    // Schließt ein Modal. Bei modal4: Audio stoppen.
-    function closeModal(id) {
-        if(id === 'modal4') {
-            const a = document.getElementById('modal4-audio');
-            if(a && !a.paused) { a.pause(); a.currentTime = 0; updateAudioBtn(false); }
-        }
-        // Bei modal6 (Video) zusätzlich das Video anhalten und zurücksetzen
-        if(id === 'modal6') {
-            const v = document.getElementById('help-video');
-            if(v && !v.paused) { v.pause(); v.currentTime = 0; }
-            // Falls wir einen aktiven Play-Button-Titel haben, zurücksetzen
-            const playBtn = document.getElementById('play-pause');
-            if(playBtn) playBtn.textContent = '▶ Play';
-        }
-                // Bei modal9 (Video) zusätzlich das Video anhalten und zurücksetzen
-        if(id === 'modal9') {
-            const v = document.getElementById('help-video');
-            if(v && !v.paused) { v.pause(); v.currentTime = 0; }
-            // Falls wir einen aktiven Play-Button-Titel haben, zurücksetzen
-            const playBtn = document.getElementById('play-pause');
-            if(playBtn) playBtn.textContent = '▶ Play';
-        }
-                        // Bei modal11 (Video) zusätzlich das Video anhalten und zurücksetzen
-        if(id === 'modal11') {
-            const v = document.getElementById('help-video');
-            if(v && !v.paused) { v.pause(); v.currentTime = 0; }
-            // Falls wir einen aktiven Play-Button-Titel haben, zurücksetzen
-            const playBtn = document.getElementById('play-pause');
-            if(playBtn) playBtn.textContent = '▶ Play';
-        }
-        document.getElementById(id).style.display = 'none';
-    }
+        <!-- Block 1 -->
+        <div class="warning-box">
+            <p class="warn">Häufige Fehler beim Schreiben</p>
+            <ul class="warning-list">
+                <li>verschachtelte Sätze und fehlende Gliederung</li>
+                <li>unklare Informationsstruktur und Sprünge im Text</li>
+                <li>mangelnde Anpassung an Zielgruppe und Medium</li>
+                <li>Vermischen von Textsorten (z. B. Anleitung vs. Fachartikel)</li>
+                <li>ungenauer oder widersprüchlicher Fachwortgebrauch</li>
+            </ul>
+            <p>
+                Diese Fehler erschweren Lesbarkeit und den Aufbau mentaler Modelle.
+                Mit Erkenntnissen der Verständlichkeits-, Leserlichkeits- und Textsortenforschung
+                lassen sie sich systematisch erkennen und vermeiden.
+            </p>
+        </div>
 
-    /*  Hotspot Setup-Helfer */
-    function setupHotspot(hotspotId, modalId) {
-        const el = document.getElementById(hotspotId);
-        if(!el) return;
-        el.addEventListener('click', function(e){
-            const openSrc = el.getAttribute('data-open-src');
-            if(openSrc) el.src = openSrc; // optionales "aktiviertes" Icon
-            openModal(modalId);
-            e.stopPropagation();
-        });
-    }
+        <!-- Block 2 -->
+        <div class="infobox">
+            <p><strong>Von kompliziert zu einfach – ohne Komplexität zu verlieren</strong></p>
+            <p>
+                Komplexe Inhalte können verständlich bleiben, wenn Informationsstruktur,
+                Makro- und Mikrostruktur sowie Textsorte klar gewählt werden. Grundlage sind
+                Verständlichkeitsmodelle, kognitionswissenschaftliche Ansätze und
+                regelbasiertes Schreiben in der Technischen Kommunikation.
+            </p>
 
-    // bestehende Hotspots verbinden
-    setupHotspot('hotspot1', 'modal1');
-    setupHotspot('hotspot2', 'modal2');
-    setupHotspot('hotspot3', 'modal3');
-    setupHotspot('hotspot4', 'modal4');
-    setupHotspot('hotspot5', 'modal5');
-    setupHotspot('hotspot6', 'modal6');
-    setupHotspot('hotspot7', 'modal7');
-    setupHotspot('hotspot8', 'modal8');
-    setupHotspot('hotspot9', 'modal9');
-    setupHotspot('hotspot10', 'modal10');
-    setupHotspot('hotspot11', 'modal11');
+            <p><strong>Tipps, wie man’s besser macht:</strong></p>
+            <ul>
+                <li>Zielgruppe und Funktion des Textes vorab analysieren</li>
+                <li>Inhalte strukturieren statt inhaltlich „vereinfachen“</li>
+                <li>übersichtliche Absätze und sprechende Überschriften</li>
+                <li>Fachbegriffe definieren und konsequent verwenden</li>
+                <li>Texte überarbeiten, Fehler clustern und DIN-Korrekturzeichen nutzen</li>
+            </ul>
+        </div>
+    </div>
+</div>
 
 
-    /* Audio-Player Logik für Modal 4*/
-    (function(){
-        const audio = document.getElementById('modal4-audio');
-        const btn = document.getElementById('modal4-audio-btn');
+<!-- Hotspot 14 (Etikettiergerät) -->
+<span class="hotspot-wrapper" data-name="Praktisches Studiensemester" style="left:75%; top:62%;">
+    <img id="hotspot14" class="hotspot"
+         src="Medien/Ettiketiergerät.png"
+         data-open-src="Medien/Ettiketiergerät1.png"
+         alt="Etikettiergerät"
+         style="width:90px;">
+</span>
+<!-- Modal 14 -->
+<div class="modal-overlay" id="modal14">
+    <div class="modal">
+        <button class="close-btn" onclick="closeModal('modal14')">Schließen</button>
 
-        function updateAudioBtn(playing) {
-            if(!btn) return;
-            btn.setAttribute('aria-pressed', playing ? 'true' : 'false');
-            btn.textContent = playing ? '■ Stopp' : '▶ Vorlesen lassen';
-        }
-        window.updateAudioBtn = updateAudioBtn;
+        <h2>Praktisches Studiensemester</h2>
 
-        if(btn && audio) {
-            btn.addEventListener('click', function(){
-                if(audio.paused) {
-                    audio.play().then(() => { updateAudioBtn(true); }).catch(err => { console.warn(err); });
-                } else {
-                    audio.pause();
-                    audio.currentTime = 0;
-                    updateAudioBtn(false);
-                }
-            });
-            audio.addEventListener('ended', function(){ updateAudioBtn(false); });
-        }
-    })();
+        <p>Das praktische Studiensemester verbindet Studium und Berufspraxis.</p>
 
-
-    /* Info-Dots (Tabbable) - Tastaturzugänglichkeit */
-    document.querySelectorAll('.info-dot').forEach(function(dot){
-        dot.addEventListener('keydown', function(e){
-            if(e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                dot.style.transform = (dot.style.transform.includes('scale(1.25)')) ? '' : 'scale(1.25)';
-                setTimeout(()=>{ dot.style.transform=''; }, 350);
-            }
-        });
-    });
-
-
-    /* Overlay-Klick schließt Modal (wenn auf Hintergrund geklickt wird)*/
-    document.querySelectorAll('.modal-overlay').forEach(function(overlay){
-        overlay.addEventListener('click', function(e){
-            if(e.target === overlay) overlay.style.display = 'none';
-        });
-    });
-
-
-    /* ESC-Taste: Alle Modals schließen + Audio/Video stoppen */
-    document.addEventListener('keydown', function(e){
-        if(e.key === 'Escape') {
-            document.querySelectorAll('.modal-overlay').forEach(m => m.style.display = 'none');
-
-            const a = document.getElementById('modal4-audio');
-            if(a && !a.paused) { a.pause(); a.currentTime = 0; updateAudioBtn(false); }
-
-            const v = document.getElementById('help-video');
-            if(v && !v.paused) { v.pause(); v.currentTime = 0; const playBtn = document.getElementById('play-pause'); if(playBtn) playBtn.textContent = '▶ Play'; }
-        }
-    });
+        <div style="overflow:auto; margin-top:8px;">
+            <table style="width:100%; border-collapse:collapse;">
+                <thead>
+                    <tr style="background:#f2f2f2;">
+                        <th style="padding:8px; border:1px solid #ddd;">Phase</th>
+                        <th style="padding:8px; border:1px solid #ddd;">Inhalte</th>
+                        <th style="padding:8px; border:1px solid #ddd;">Kompetenzen</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="padding:8px; border:1px solid #ddd;">Bewerbung</td>
+                        <td style="padding:8px; border:1px solid #ddd;">Unternehmen suchen, Unterlagen erstellen</td>
+                        <td style="padding:8px; border:1px solid #ddd;">Selbstorganisation, Professionalität</td>
+                    </tr>
+                    <tr>
+                        <td style="padding:8px; border:1px solid #ddd;">Praxis</td>
+                        <td style="padding:8px; border:1px solid #ddd;">Mitarbeit an Projekten</td>
+                        <td style="padding:8px; border:1px solid #ddd;">Team- und Fachkompetenz</td>
+                    </tr>
+                    <tr>
+                        <td style="padding:8px; border:1px solid #ddd;">Reflexion</td>
+                        <td style="padding:8px; border:1px solid #ddd;">Bericht, Präsentation</td>
+                        <td style="padding:8px; border:1px solid #ddd;">Wissenschaftliches Arbeiten</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 
 
-    /* ----------------------------
-       SPEZIELLE VIDEO-LOGIK FÜR MODAL 6
-       - Sprung-Buttons (via data-seconds)
-       - Back/Forward 10s
-       - Play/Pause Toggle
-       - Zeit-Anzeige (aktuelle Zeit / Dauer)
-       - Barrierefreiheit: aria-live für Zeit
-       ---------------------------- */
-    (function(){
-        const video = document.getElementById('help-video');
-        if(!video) return; // Falls Video nicht vorhanden, nichts tun
 
-        const jumpBtns = document.querySelectorAll('#modal6 .jump-to');
-        const back10 = document.getElementById('back-10');
-        const forward10 = document.getElementById('forward-10');
-        const playPause = document.getElementById('play-pause');
-        const timeDisplay = document.getElementById('time-display');
 
-        // Hilfsfunktion: Sekunden in M:SS umwandeln
-        function fmt(s){
-            if(isNaN(s)) return '0:00';
-            const m = Math.floor(s/60);
-            const sec = Math.floor(s%60);
-            return m + ':' + (sec<10 ? '0'+sec : sec);
-        }
+<!-- Hotspot 15 (Aufbewahrung) -->
+<span class="hotspot-wrapper" data-name="Medienmanagement" style="left:45%; top:10%;">
+    <img id="hotspot15" class="hotspot"
+         src="Medien/Aufbewahrung.png"
+         data-open-src="Medien/Aufbewahrung1.png"
+         alt="Aufbewahrung"
+         style="width:155px;">
+</span>
+<!-- Modal 15 -->
+<div class="modal-overlay" id="modal15">
+    <div class="modal">
+        <button class="close-btn" onclick="closeModal('modal15')">Schließen</button>
 
-        // Aktualisiert die Anzeige (z. B. "0:10 / 2:30")
-        function updateTimeDisplay(){
-            const cur = fmt(video.currentTime);
-            const dur = isNaN(video.duration) ? '0:00' : fmt(video.duration);
-            if(timeDisplay) timeDisplay.textContent = cur + ' / ' + dur;
-        }
+        <h2>Medienmanagement</h2>
 
-        // Springt zu einer bestimmten Zeit (Sekunden) und spielt an
-        function jumpTo(seconds){
-            // clamp, um außerhalb der Dauer zu vermeiden
-            const target = Math.max(0, Math.min(seconds, video.duration || seconds));
-            video.currentTime = target;
-            video.play().catch(err => { /* play kann fehlschlagen (Autoplay-Policy) */ });
-        }
+        <div class="image-area">
+            <div class="image-wrapper">
+                <img src="Medien/Medienmanagement.png" alt="Medienlandschaft">
 
-        // Sprung-Buttons mit data-seconds verbinden
-        jumpBtns.forEach(btn => {
-            btn.addEventListener('click', function(){
-                const s = Number(btn.getAttribute('data-seconds'));
-                if(!isNaN(s)) jumpTo(s);
-            });
-        });
+                <!-- Medienpunkte -->
+                <div class="info-dot" style="left:35%; top:20%;">
+                    <div class="dot-tip">Bildergalerie – Canva: <br>
+                        Canva eignet sich, um schnell ansprechende Bildergalerien<br>
+                        und Layouts mit Vorlagen, Texten und Grafiken zu gestalten.</div>
+                </div>
+                
+                <div class="info-dot" style="left:27%; top:45%;">
+                    <div class="dot-tip">Skizze – GoodNotes:<br>
+                        GoodNotes ermöglicht das Anfertigen handschriftlicher<br>
+                        Skizzen und Notizen auf dem Tablet, die sich leicht in <br>
+                        Präsentationen einbinden lassen.</div>
+                </div>
+                <div class="info-dot" style="left:75%; top:60%;">
+                    <div class="dot-tip">Texten – Word:<br>
+                        Word wird zum strukturierten Erstellen,<br>
+                        Überarbeiten und Formatieren von Texten genutzt.</div>
+                </div>
+                <div class="info-dot" style="left:60%; top:20%;">
+                    <div class="dot-tip">Grafik – Affinity: <br>
+                        In Affinity können Grafiken präzise gestaltet<br>
+                         und grafisch ansprechend in Medien integriert werden.</div>
+                         </div>
 
-        // -10s
-        back10.addEventListener('click', function(){
-            jumpTo((video.currentTime || 0) - 10);
-        });
-        // +10s
-        forward10.addEventListener('click', function(){
-            jumpTo((video.currentTime || 0) + 10);
-        });
+                <div class="info-dot" style="left:55%; top:35%;">
+                    <div class="dot-tip">Tutorial – Blender:<br> 
+                        Mit Blender lassen sich 3D-Modelle und Animationen erstellen,<br> 
+                        die sich hervorragend für visuelle Tutorials eignen.</div>
+                </div>
+                <div class="info-dot" style="left:50%; top:35%;">
+                    <div class="dot-tip">Video – ClipCamp und Snippingtool: 
+                        <br>Mit ClipCamp lassen sich Videos einfach schneiden und bearbeiten, 
+                        <br>während das Snippingtool kurze Bildschirmmitschnitte oder -ausschnitte 
+                        <br>für Videoerklärungen ermöglicht.</div>
+                </div>
 
-        // Play / Pause Toggle
-        playPause.addEventListener('click', function(){
-            if(video.paused) {
-                video.play().then(()=>{ playPause.textContent = '❚❚ Pause'; }).catch(()=>{ /* ignore */ });
-            } else {
-                video.pause();
-                playPause.textContent = '▶ Play';
-            }
-        });
+            </div>
+        </div>
+        <p class="help" style="margin-top:12px;">Fahre mit der Maus über die Punkte, um die Beschreibungen zu sehen.</p>
+    </div>
+</div>
 
-        // Video Events: Update Zeit-Anzeige
-        video.addEventListener('timeupdate', updateTimeDisplay);
-        video.addEventListener('loadedmetadata', updateTimeDisplay);
-        video.addEventListener('ended', function(){ if(playPause) playPause.textContent = '▶ Play'; updateTimeDisplay(); });
-
-        // Wenn das Modal6 geschlossen wird (durch closeModal) → Video wird dort bereits gestoppt.
-
-    })();
-
-    /* HINTERGRUND ÄNDERN, WENN ALLE HOTSPOTS GEKLICKT WURDEN */
-
-    const hotspotIds = ['hotspot1','hotspot2','hotspot3','hotspot4','hotspot5','hotspot6','hotspot7','hotspot8','hotspot9','hotspot10','hotspot11'];
-    const clickedHotspots = new Set();
-
-    // bestehendes setupHotspot erweitern → nach dem Öffnen registrieren
-    hotspotIds.forEach(id => {
-        const el = document.getElementById(id);
-        if(el){
-            el.addEventListener('click', () => {
-                clickedHotspots.add(id);
-                if(clickedHotspots.size === hotspotIds.length){
-                    document.body.classList.add('all-hotspots-done');
-                }
-            });
-        }
-    });
-</script>
+    <script src="script.js"></script>
 
 </body>
+
 </html>
